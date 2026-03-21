@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profit Master Simulator</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #eef2f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #007bff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="game"></div>
+
+<script>
+let round = 0;
+let profit = 0;
+
+const scenarios = [
+{
+  question: "A buyer offers $35/unit. Variable cost is $30. What do you do?",
+  options: ["Accept", "Reject"],
+  correct: "Accept",
+  impact: 2500,
+  explanation: "Positive contribution margin ($5). Accepting adds profit."
+},
+{
+  question: "Fixed costs = $20,000. CM = $10/unit. Break-even?",
+  options: ["1,000 units", "2,000 units", "500 units"],
+  correct: "2,000 units",
+  impact: 1500,
+  explanation: "Break-even = 20,000 / 10 = 2,000 units."
+},
+{
+  question: "Idle capacity. Special order below normal price but above variable cost.",
+  options: ["Accept", "Reject"],
+  correct: "Accept",
+  impact: 2000,
+  explanation: "Idle capacity means any positive CM increases profit."
+},
+{
+  question: "Should sunk costs affect decisions?",
+  options: ["Yes", "No"],
+  correct: "No",
+  impact: 1000,
+  explanation: "Sunk costs are irrelevant to decision making."
+},
+{
+  question: "Make or Buy: Internal cost $12, supplier $10.",
+  options: ["Make", "Buy"],
+  correct: "Buy",
+  impact: 1800,
+  explanation: "Buying reduces costs and improves profitability."
+}
+];
+
+function loadGame() {
+  if (round >= scenarios.length) {
+    endGame();
+    return;
+  }
+
+  let s = scenarios[round];
+
+  document.getElementById("game").innerHTML = `
+    <h1>📊 Profit Master</h1>
+    <p><b>Round ${round + 1} of ${scenarios.length}</b></p>
+    <p><b>Profit:</b> $${profit}</p>
+    <p>${s.question}</p>
+    ${s.options.map(o =>
+      `<button onclick="answer('${o}')">${o}</button>`
+    ).join("")}
+  `;
+}
+
+function answer(choice) {
+  let s = scenarios[round];
+  let correct = choice === s.correct;
+
+  if (correct) profit += s.impact;
+  else profit -= 1000;
+
+  document.getElementById("game").innerHTML = `
+    <h1>📊 Profit Master</h1>
+    <p>${correct ? "✅ Correct!" : "❌ Incorrect"}</p>
+    <p>${s.explanation}</p>
+    <p><b>Profit Now:</b> $${profit}</p>
+    <button onclick="next()">Next</button>
+  `;
+}
+
+function next() {
+  round++;
+  loadGame();
+}
+
+function endGame() {
+  document.getElementById("game").innerHTML = `
+    <h1>🎉 Game Complete</h1>
+    <h2>Total Profit: $${profit}</h2>
+    <p>${profit > 5000 ? "Excellent managerial decisions!" : "Review and try again."}</p>
+    <button onclick="restart()">Play Again</button>
+  `;
+}
+
+function restart() {
+  round = 0;
+  profit = 0;
+  loadGame();
+}
+
+loadGame();
+</script>
+
+</body>
+</html>
