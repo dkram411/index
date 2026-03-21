@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profit Master Simulator</title>
+<title>Top-Down Decision Making</title>
 
 <style>
 body {
   font-family: Arial;
-  background: #eef2f7;
+  background: linear-gradient(135deg, #0c2340, #e87722);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,12 +21,22 @@ body {
   padding: 25px;
   border-radius: 12px;
   width: 90%;
-  max-width: 600px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  max-width: 650px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-h1 {
+h1, h2 {
   text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+ul {
+  margin-top: 10px;
 }
 
 button {
@@ -35,14 +45,14 @@ button {
   margin-top: 10px;
   border: none;
   border-radius: 8px;
-  background: #007bff;
+  background: #0c2340;
   color: white;
   font-size: 16px;
   cursor: pointer;
 }
 
 button:hover {
-  background: #0056b3;
+  background: #091a30;
 }
 </style>
 </head>
@@ -56,42 +66,41 @@ let round = 0;
 let profit = 0;
 
 const scenarios = [
-{
-  question: "A buyer offers $35/unit. Variable cost is $30. What do you do?",
-  options: ["Accept", "Reject"],
-  correct: "Accept",
-  impact: 2500,
-  explanation: "Positive contribution margin ($5). Accepting adds profit."
-},
-{
-  question: "Fixed costs = $20,000. CM = $10/unit. Break-even?",
-  options: ["1,000 units", "2,000 units", "500 units"],
-  correct: "2,000 units",
-  impact: 1500,
-  explanation: "Break-even = 20,000 / 10 = 2,000 units."
-},
-{
-  question: "Idle capacity. Special order below normal price but above variable cost.",
-  options: ["Accept", "Reject"],
-  correct: "Accept",
-  impact: 2000,
-  explanation: "Idle capacity means any positive CM increases profit."
-},
-{
-  question: "Should sunk costs affect decisions?",
-  options: ["Yes", "No"],
-  correct: "No",
-  impact: 1000,
-  explanation: "Sunk costs are irrelevant to decision making."
-},
-{
-  question: "Make or Buy: Internal cost $12, supplier $10.",
-  options: ["Make", "Buy"],
-  correct: "Buy",
-  impact: 1800,
-  explanation: "Buying reduces costs and improves profitability."
-}
+{question:"A buyer offers $35/unit. Variable cost is $30. What do you do?", options:["Accept","Reject"], correct:"Accept", impact:2500, explanation:"Positive contribution margin ($5). Accepting adds profit."},
+{question:"Fixed costs = $20,000. CM = $10/unit. Break-even?", options:["1,000 units","2,000 units","500 units"], correct:"2,000 units", impact:1500, explanation:"Break-even = 20,000 / 10 = 2,000 units."},
+{question:"Idle capacity. Special order below normal price but above variable cost.", options:["Accept","Reject"], correct:"Accept", impact:2000, explanation:"Idle capacity means any positive CM increases profit."},
+{question:"Should sunk costs affect decisions?", options:["Yes","No"], correct:"No", impact:1000, explanation:"Sunk costs are irrelevant."},
+{question:"Make or Buy: Internal cost $12, supplier $10.", options:["Make","Buy"], correct:"Buy", impact:1800, explanation:"Buying reduces costs."},
+{question:"Contribution margin = Price $50, VC $30. CM?", options:["$10","$20","$30"], correct:"$20", impact:1200, explanation:"CM = 50 - 30 = $20."},
+{question:"Break-even increases if fixed costs…", options:["Increase","Decrease"], correct:"Increase", impact:1000, explanation:"Higher fixed costs require more units to break even."},
+{question:"Opportunity cost should be considered?", options:["Yes","No"], correct:"Yes", impact:1200, explanation:"Opportunity costs are relevant."},
+{question:"If capacity is full, special orders should…", options:["Be rejected","Be accepted"], correct:"Be rejected", impact:1500, explanation:"They displace higher-margin sales."},
+{question:"Variable cost per unit increases, profit…", options:["Decreases","Increases"], correct:"Decreases", impact:1000, explanation:"Higher VC reduces margin."},
+{question:"CM ratio = CM / Sales. Used for?", options:["Profit analysis","Tax calc"], correct:"Profit analysis", impact:1200, explanation:"Used in CVP analysis."},
+{question:"Fixed costs change with volume?", options:["Yes","No"], correct:"No", impact:1000, explanation:"Fixed costs stay constant in short term."},
+{question:"Relevant cost example?", options:["Future cost","Sunk cost"], correct:"Future cost", impact:1200, explanation:"Only future costs matter."},
+{question:"Higher price with same cost → CM?", options:["Higher","Lower"], correct:"Higher", impact:1000, explanation:"Higher price increases margin."},
+{question:"Decision focus should be on…", options:["Total cost","Relevant cost"], correct:"Relevant cost", impact:1500, explanation:"Only relevant costs impact decisions."}
 ];
+
+function showIntro() {
+  document.getElementById("game").innerHTML = `
+    <h1>Top-Down Decision Making</h1>
+    <p class="subtitle">An accounting game focused on managerial decision making</p>
+    <h2>Learning Objectives</h2>
+    <ul>
+      <li>Understand contribution margin</li>
+      <li>Apply break-even analysis</li>
+      <li>Identify relevant vs. irrelevant costs</li>
+      <li>Make short-term managerial decisions</li>
+    </ul>
+    <button onclick="startGame()">Start Game</button>
+  `;
+}
+
+function startGame() {
+  loadGame();
+}
 
 function loadGame() {
   if (round >= scenarios.length) {
@@ -102,13 +111,10 @@ function loadGame() {
   let s = scenarios[round];
 
   document.getElementById("game").innerHTML = `
-    <h1>📊 Profit Master</h1>
-    <p><b>Round ${round + 1} of ${scenarios.length}</b></p>
+    <h2>Round ${round + 1} of ${scenarios.length}</h2>
     <p><b>Profit:</b> $${profit}</p>
     <p>${s.question}</p>
-    ${s.options.map(o =>
-      `<button onclick="answer('${o}')">${o}</button>`
-    ).join("")}
+    ${s.options.map(o => `<button onclick="answer('${o}')">${o}</button>`).join("")}
   `;
 }
 
@@ -120,8 +126,7 @@ function answer(choice) {
   else profit -= 1000;
 
   document.getElementById("game").innerHTML = `
-    <h1>📊 Profit Master</h1>
-    <p>${correct ? "✅ Correct!" : "❌ Incorrect"}</p>
+    <h2>${correct ? "✅ Correct!" : "❌ Incorrect"}</h2>
     <p>${s.explanation}</p>
     <p><b>Profit Now:</b> $${profit}</p>
     <button onclick="next()">Next</button>
@@ -137,7 +142,7 @@ function endGame() {
   document.getElementById("game").innerHTML = `
     <h1>🎉 Game Complete</h1>
     <h2>Total Profit: $${profit}</h2>
-    <p>${profit > 5000 ? "Excellent managerial decisions!" : "Review and try again."}</p>
+    <p>${profit > 12000 ? "Excellent decision-making!" : "Review concepts and try again."}</p>
     <button onclick="restart()">Play Again</button>
   `;
 }
@@ -145,10 +150,10 @@ function endGame() {
 function restart() {
   round = 0;
   profit = 0;
-  loadGame();
+  showIntro();
 }
 
-loadGame();
+showIntro();
 </script>
 
 </body>
