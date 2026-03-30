@@ -1,301 +1,1223 @@
-import React, { useMemo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
-/**
- * MBA Accounting Master: Interactive Learning Game
- * Topics: Financial Statements, Break-even, Budgeting, Variance, Revenue Recognition, Inventory
- */
-
-const TOPICS = [
-  {
-    id: "financial_statements",
-    title: "Financial Statements Basics",
-    objective:
-      "Understand the relationship between Income Statement, Balance Sheet, and Cash Flow Statement.",
-    questions: [
-      {
-        prompt:
-          "If a company earns revenue on credit, what happens immediately?",
-        options: [
-          "Cash increases",
-          "Accounts receivable increases",
-          "Liabilities increase",
-          "Equity decreases",
-        ],
-        answer: 1,
-        explanation:
-          "Revenue earned on credit increases Accounts Receivable, not cash. Revenue still increases equity via retained earnings.",
-      },
-      {
-        prompt: "Which statement shows a company's financial position at a point in time?",
-        options: [
-          "Income Statement",
-          "Cash Flow Statement",
-          "Balance Sheet",
-          "Statement of Retained Earnings",
-        ],
-        answer: 2,
-        explanation:
-          "The Balance Sheet presents assets, liabilities, and equity at a specific point in time.",
-      },
-    ],
-  },
-  {
-    id: "break_even",
-    title: "Break-Even Analysis",
-    objective:
-      "Calculate and interpret break-even point using fixed and variable costs.",
-    questions: [
-      {
-        prompt:
-          "A company has fixed costs of $10,000, sells at $50/unit, variable cost $30/unit. Break-even units?",
-        options: ["250 units", "500 units", "400 units", "300 units"],
-        answer: 1,
-        explanation:
-          "Contribution margin = 50 - 30 = 20. Break-even = 10,000 / 20 = 500 units.",
-      },
-      {
-        prompt:
-          "If variable cost increases, break-even point will:",
-        options: ["Decrease", "Increase", "Stay same", "Become zero"],
-        answer: 1,
-        explanation:
-          "Higher variable cost reduces contribution margin, increasing break-even point.",
-      },
-    ],
-  },
-  {
-    id: "budgeting",
-    title: "Budgeting & Forecasting",
-    objective: "Understand static vs flexible budgets and variance interpretation.",
-    questions: [
-      {
-        prompt:
-          "A flexible budget primarily adjusts for:",
-        options: ["Fixed costs", "Activity level changes", "Equity changes", "Depreciation methods"],
-        answer: 1,
-        explanation:
-          "Flexible budgets adjust based on activity levels to improve performance evaluation.",
-      },
-      {
-        prompt:
-          "Which variance is due to difference in production volume?",
-        options: ["Price variance", "Efficiency variance", "Volume variance", "Mix variance"],
-        answer: 2,
-        explanation:
-          "Volume variance arises from differences between planned and actual production volume.",
-      },
-    ],
-  },
-  {
-    id: "revenue_recognition",
-    title: "Revenue Recognition (ASC 606)",
-    objective:
-      "Apply the five-step revenue recognition model in business scenarios.",
-    questions: [
-      {
-        prompt:
-          "Revenue is recognized when:",
-        options: [
-          "Cash is received",
-          "Performance obligation is satisfied",
-          "Invoice is sent",
-          "Contract is signed",
-        ],
-        answer: 1,
-        explanation:
-          "Under ASC 606, revenue is recognized when performance obligations are satisfied.",
-      },
-    ],
-  },
-  {
-    id: "inventory",
-    title: "Inventory Valuation",
-    objective: "Compare FIFO, LIFO, and weighted average methods.",
-    questions: [
-      {
-        prompt:
-          "In rising prices, which method results in higher net income?",
-        options: ["LIFO", "FIFO", "Weighted Average", "All equal"],
-        answer: 1,
-        explanation:
-          "FIFO uses older, cheaper costs first, leading to higher net income in inflation.",
-      },
-    ],
-  },
-];
-
-function ProgressBar({ value }) {
-  return (
-    <div className="w-full bg-gray-200 rounded-full h-2">
-      <div
-        className="bg-blue-600 h-2 rounded-full"
-        style={{ width: `${value}%` }}
-      />
-    </div>
-  );
-}
-
-export default function MBAGame() {
-  const [started, setStarted] = useState(false);
-  const [topicIndex, setTopicIndex] = useState(0);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [feedback, setFeedback] = useState(null);
-  const [answered, setAnswered] = useState(false);
-  const [finished, setFinished] = useState(false);
-
-  const currentTopic = TOPICS[topicIndex];
-  const currentQuestion = currentTopic?.questions?.[questionIndex];
-
-  const totalQuestions = useMemo(
-    () => TOPICS.reduce((sum, t) => sum + t.questions.length, 0),
-    []
-  );
-
-  const progress =
-    ((topicIndex * 10 + questionIndex) / totalQuestions) * 100;
-
-  const handleAnswer = (idx) => {
-    if (answered) return;
-
-    const correct = idx === currentQuestion.answer;
-
-    setAnswered(true);
-
-    if (correct) {
-      setScore((s) => s + 1);
-      setFeedback("Correct! " + currentQuestion.explanation);
-    } else {
-      setFeedback(
-        "Incorrect. " + currentQuestion.explanation
-      );
-    }
-  };
-
-  const next = () => {
-    setAnswered(false);
-    setFeedback(null);
-
-    if (questionIndex + 1 < currentTopic.questions.length) {
-      setQuestionIndex(questionIndex + 1);
-    } else if (topicIndex + 1 < TOPICS.length) {
-      setTopicIndex(topicIndex + 1);
-      setQuestionIndex(0);
-    } else {
-      setFinished(true);
-    }
-  };
-
-  if (!started) {
-    return (
-      <div className="p-6 max-w-2xl mx-auto">
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <h1 className="text-2xl font-bold">
-              MBA Accounting Master Game
-            </h1>
-            <p className="text-gray-600">
-              Learn core MBA accounting concepts through interactive
-              scenarios, quizzes, and instant feedback.
-            </p>
-            <ul className="list-disc ml-5 text-sm text-gray-700">
-              <li>Financial Statements Interpretation</li>
-              <li>Break-even & Cost Analysis</li>
-              <li>Budgeting & Variance Analysis</li>
-              <li>Revenue Recognition (ASC 606)</li>
-              <li>Inventory Valuation Methods</li>
-            </ul>
-            <Button onClick={() => setStarted(true)}>
-              Start Learning Journey
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The CFO's Dilemma — CVP Mastery Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0e0d;
+    --paper: #f5f0e8;
+    --cream: #ede7d9;
+    --gold: #c9933a;
+    --gold-light: #e8b95a;
+    --red: #b83232;
+    --green: #2a6b3c;
+    --green-light: #e8f4ec;
+    --red-light: #fbeaea;
+    --blue: #1a3a5c;
+    --blue-light: #e8f0f8;
+    --muted: #6b6259;
+    --border: #d4cbbf;
+    --shadow: rgba(15,14,13,0.12);
   }
 
-  if (finished) {
-    const percentage = Math.round((score / totalQuestions) * 100);
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    return (
-      <div className="p-6 max-w-2xl mx-auto">
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <h2 className="text-2xl font-bold">Final Score</h2>
-            <ProgressBar value={percentage} />
-            <p className="text-lg">
-              You scored {score} / {totalQuestions} ({percentage}%)
-            </p>
-            <p className="text-gray-600">
-              {percentage >= 80
-                ? "Excellent mastery of MBA accounting concepts."
-                : percentage >= 50
-                ? "Good understanding, but review key concepts."
-                : "Needs improvement. Revisit learning modules."}
-            </p>
-            <Button
-              onClick={() => {
-                setStarted(false);
-                setTopicIndex(0);
-                setQuestionIndex(0);
-                setScore(0);
-                setFinished(false);
-              }}
-            >
-              Restart Game
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
   }
 
-  return (
-    <div className="p-4 max-w-3xl mx-auto space-y-4">
-      <Card>
-        <CardContent className="p-4 space-y-2">
-          <h2 className="text-xl font-bold">
-            {currentTopic.title}
-          </h2>
-          <p className="text-sm text-gray-600">
-            Learning Objective: {currentTopic.objective}
-          </p>
-          <ProgressBar value={progress} />
-        </CardContent>
-      </Card>
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(201,147,58,0.08) 28px),
+      repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(201,147,58,0.04) 28px);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-      <Card>
-        <CardContent className="p-4 space-y-4">
-          <h3 className="font-semibold">
-            Question {questionIndex + 1}
-          </h3>
-          <p>{currentQuestion.prompt}</p>
+  .noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
 
-          <div className="grid gap-2">
-            {currentQuestion.options.map((opt, idx) => (
-              <Button
-                key={idx}
-                variant="outline"
-                onClick={() => handleAnswer(idx)}
-              >
-                {opt}
-              </Button>
-            ))}
-          </div>
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+  }
 
-          {feedback && (
-            <div className="p-3 bg-gray-100 rounded-md text-sm">
-              {feedback}
-            </div>
-          )}
+  /* ── SCREENS ── */
+  .screen { display: none; animation: fadeIn 0.4s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-          {answered && (
-            <Button onClick={next}>Next</Button>
-          )}
-        </CardContent>
-      </Card>
+  /* ── HEADER ── */
+  .masthead {
+    text-align: center;
+    padding: 48px 20px 32px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .masthead::after {
+    content: '';
+    display: block;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--gold) 0, var(--gold) 8px, transparent 8px, transparent 16px);
+    margin-top: 12px;
+  }
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .game-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 7vw, 64px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .game-title span { color: var(--gold); }
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 10px;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    height: 8px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 4px;
+  }
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── SCORE BADGE ── */
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 10px 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 4px;
+  }
+  .score-bar .label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; opacity: 0.6; }
+  .score-bar .value { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold-light); }
+  .chapter-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    background: var(--gold);
+    color: var(--ink);
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 32px;
+    box-shadow: 4px 4px 0 var(--border);
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .card-accent {
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gold);
+    border-radius: 6px 0 0 6px;
+  }
+
+  .scenario-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 3vw, 22px);
+    line-height: 1.45;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .context-text {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: var(--cream);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    font-style: italic;
+  }
+
+  /* ── DATA TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 16px 0;
+    font-family: 'DM Mono', monospace;
+  }
+  .data-table th {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .data-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table tr:nth-child(even) td { background: var(--cream); }
+  .data-table .num { text-align: right; }
+  .data-table .highlight { color: var(--gold); font-weight: 600; }
+
+  /* ── ANSWERS ── */
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  @media (max-width: 560px) { .answers-grid { grid-template-columns: 1fr; } }
+
+  .answer-btn {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .answer-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0; height: 100%;
+    background: var(--gold);
+    opacity: 0.08;
+    transition: width 0.3s;
+  }
+  .answer-btn:hover:not(:disabled)::before { width: 100%; }
+  .answer-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 2px 4px 12px var(--shadow);
+  }
+  .answer-btn.correct {
+    border-color: var(--green);
+    background: var(--green-light);
+    color: var(--green);
+  }
+  .answer-btn.wrong {
+    border-color: var(--red);
+    background: var(--red-light);
+    color: var(--red);
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+  .answer-btn:disabled { cursor: default; transform: none !important; }
+  .answer-letter {
+    font-family: 'DM Mono', monospace;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* ── FEEDBACK ── */
+  .feedback-box {
+    display: none;
+    margin-top: 20px;
+    border-radius: 6px;
+    overflow: hidden;
+    animation: slideUp 0.35s ease;
+  }
+  .feedback-box.visible { display: block; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .feedback-header {
+    padding: 12px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .feedback-header.correct { background: var(--green); color: #fff; }
+  .feedback-header.wrong { background: var(--red); color: #fff; }
+  .feedback-body {
+    padding: 20px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+  .feedback-body.correct { background: var(--green-light); border: 1px solid #acd8b8; border-top: none; }
+  .feedback-body.wrong { background: var(--red-light); border: 1px solid #e8b4b4; border-top: none; }
+  .feedback-body strong { color: var(--blue); }
+  .feedback-body .formula {
+    font-family: 'DM Mono', monospace;
+    background: rgba(255,255,255,0.8);
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 12px 0;
+    font-size: 13px;
+    border-left: 3px solid var(--gold);
+  }
+  .feedback-body .insight {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 4px;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .insight-icon { font-style: normal; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--gold);
+  }
+  .btn-primary:hover { background: var(--blue); transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-outline {
+    display: inline-block;
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    padding: 12px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: var(--ink); color: var(--paper); }
+
+  .btn-next {
+    margin-top: 20px;
+    display: none;
+  }
+  .btn-next.visible { display: inline-block; }
+
+  /* ── INTRO SCREEN ── */
+  .intro-card {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 8px;
+    padding: 40px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .intro-card::before {
+    content: '§';
+    position: absolute;
+    top: -20px; right: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 180px;
+    opacity: 0.05;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .intro-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--gold-light);
+    margin-bottom: 16px;
+  }
+  .intro-card p { font-size: 15px; line-height: 1.8; opacity: 0.85; margin-bottom: 12px; }
+
+  .objectives-list {
+    list-style: none;
+    margin: 20px 0;
+  }
+  .objectives-list li {
+    padding: 10px 16px;
+    background: var(--cream);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    border-left: 4px solid var(--gold);
+    display: flex;
+    gap: 10px;
+  }
+  .objectives-list li .num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    font-weight: 600;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .chapter-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+  @media (max-width: 480px) { .chapter-nav { grid-template-columns: 1fr; } }
+  .chapter-pill {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    background: #fff;
+  }
+  .chapter-pill strong {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  /* ── RESULTS SCREEN ── */
+  .results-hero {
+    text-align: center;
+    padding: 40px 20px;
+    border-bottom: 2px dashed var(--border);
+    margin-bottom: 28px;
+  }
+  .results-grade {
+    font-family: 'Playfair Display', serif;
+    font-size: 96px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .results-grade.A { color: var(--green); }
+  .results-grade.B { color: var(--blue); }
+  .results-grade.C { color: var(--gold); }
+  .results-grade.D { color: var(--red); }
+
+  .results-label { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 3px; color: var(--muted); margin-top: 8px; }
+  .results-score-num { font-family: 'Playfair Display', serif; font-size: 28px; margin-top: 8px; color: var(--ink); }
+
+  .results-breakdown {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 480px) { .results-breakdown { grid-template-columns: 1fr; } }
+  .result-chapter {
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #fff;
+    position: relative;
+  }
+  .result-chapter .chap-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--muted); margin-bottom: 4px; }
+  .result-chapter .chap-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .result-chapter .chap-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .result-chapter .chap-score.perfect { color: var(--green); }
+  .result-chapter .chap-score.good { color: var(--blue); }
+  .result-chapter .chap-score.ok { color: var(--gold); }
+  .result-chapter .chap-score.low { color: var(--red); }
+
+  .mini-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+  .mini-fill { height: 100%; border-radius: 2px; background: var(--gold); }
+
+  .key-takeaway {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .key-takeaway h3 { font-family: 'Playfair Display', serif; color: var(--gold-light); margin-bottom: 12px; font-size: 18px; }
+  .key-takeaway p { font-size: 14px; line-height: 1.8; opacity: 0.85; }
+
+  .citation-box {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 20px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.8;
+    margin-top: 24px;
+  }
+  .citation-box strong { color: var(--ink); font-weight: 600; }
+
+  .divider { border: none; border-top: 1px dashed var(--border); margin: 24px 0; }
+
+  /* ── INPUT QUESTION ── */
+  .calc-input-wrap {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .calc-input {
+    flex: 1;
+    min-width: 140px;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    color: var(--ink);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: right;
+  }
+  .calc-input:focus { border-color: var(--gold); }
+  .calc-input.correct { border-color: var(--green); background: var(--green-light); }
+  .calc-input.wrong { border-color: var(--red); background: var(--red-light); }
+  .input-label {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .input-group { flex: 1; min-width: 140px; }
+
+  .hint-box {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: var(--blue-light);
+    border: 1px solid #bcd4ec;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--blue);
+    display: none;
+  }
+  .hint-box.visible { display: block; }
+
+  /* ── CHART ── */
+  .chart-area {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    margin: 16px 0;
+    overflow: hidden;
+  }
+  canvas { display: block; width: 100% !important; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    .card { padding: 20px; }
+    .intro-card { padding: 24px; }
+    .answers-grid { gap: 8px; }
+    .answer-btn { padding: 12px 14px; font-size: 13px; }
+  }
+
+  /* ── TOOLTIP ── */
+  .tooltip-term {
+    border-bottom: 1px dashed var(--gold);
+    cursor: help;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ── CHAPTER BADGE ── */
+  .chapter-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .chapter-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    background: var(--gold);
+    color: var(--ink);
+    padding: 4px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .chapter-title-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+<!-- ════════════════════════════ INTRO ════════════════════════════ -->
+<div id="screen-intro" class="screen active">
+  <div class="masthead">
+    <div class="eyebrow">MBA CORE ACCOUNTING · INTERACTIVE SIMULATION</div>
+    <h1 class="game-title">The CFO's<br><span>Dilemma</span></h1>
+    <p class="subtitle">A Cost-Volume-Profit Mastery Game</p>
+  </div>
+
+  <div class="intro-card">
+    <h2>Welcome, Associate.</h2>
+    <p>You've just joined Meridian Consumer Goods as a Senior Financial Analyst. The CFO has one hour before the Board meeting — and she needs answers.</p>
+    <p>Over the next 12 questions, you'll advise real business decisions using <strong style="color:var(--gold-light)">Cost-Volume-Profit (CVP) analysis</strong> — the framework that connects every unit sold to profit and loss. Get it right, and you'll earn your seat at the table.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-accent"></div>
+    <div class="scenario-label">📋 Learning Objectives</div>
+    <ul class="objectives-list">
+      <li><span class="num">01</span>Distinguish fixed costs, variable costs, and mixed costs — and explain why it matters for every financial decision.</li>
+      <li><span class="num">02</span>Calculate contribution margin (per unit and ratio) and interpret what it reveals about business scalability.</li>
+      <li><span class="num">03</span>Determine break-even point in both units and sales dollars — and translate that into a real operational target.</li>
+      <li><span class="num">04</span>Apply the margin of safety concept to assess downside risk.</li>
+      <li><span class="num">05</span>Use CVP to evaluate strategic decisions: pricing changes, cost structure shifts, and target profit scenarios.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="scenario-label">🗺 Game Structure — 3 Chapters</div>
+    <div class="chapter-nav">
+      <div class="chapter-pill"><strong>CHAPTER 1</strong>Cost Fundamentals<br><small style="color:var(--muted)">Q1–4 · Foundations</small></div>
+      <div class="chapter-pill"><strong>CHAPTER 2</strong>Break-Even & CVP<br><small style="color:var(--muted)">Q5–9 · Core Analysis</small></div>
+      <div class="chapter-pill"><strong>CHAPTER 3</strong>Strategic Decisions<br><small style="color:var(--muted)">Q10–12 · Application</small></div>
     </div>
-  );
+    <p style="font-size:13px; color:var(--muted); margin-top:8px;">Read each scenario carefully. Wrong answers reveal the correct logic — every explanation is part of the learning.</p>
+  </div>
+
+  <div style="text-align:center; padding: 8px 0 40px;">
+    <button class="btn-primary" onclick="startGame()">Begin Simulation →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════ GAME ════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <div class="progress-label">
+    <span id="progress-text">Question 1 of 12</span>
+    <span id="score-display">Score: 0 pts</span>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" id="progress-bar" style="width:0%"></div></div>
+
+  <div id="question-area"></div>
+
+  <div style="text-align:center; margin-top:8px;">
+    <button class="btn-primary btn-next" id="btn-next" onclick="nextQuestion()">Next Question →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════ RESULTS ════════════════════════════ -->
+<div id="screen-results" class="screen">
+  <div class="masthead">
+    <div class="eyebrow">SIMULATION COMPLETE</div>
+    <h1 class="game-title">Your <span>Report</span> Card</h1>
+  </div>
+
+  <div class="results-hero">
+    <div class="results-grade" id="result-grade">A</div>
+    <div class="results-label">FINAL GRADE</div>
+    <div class="results-score-num" id="result-score">— / 120 points</div>
+    <p id="result-headline" style="margin-top:12px; font-style:italic; color:var(--muted); font-size:15px;"></p>
+  </div>
+
+  <div class="results-breakdown" id="result-breakdown"></div>
+
+  <div class="key-takeaway">
+    <h3>The CFO's Summary</h3>
+    <p id="result-takeaway"></p>
+  </div>
+
+  <div style="text-align:center; margin: 24px 0;">
+    <button class="btn-primary" onclick="restartGame()" style="margin-right:12px;">Replay Simulation ↺</button>
+    <button class="btn-outline" onclick="showIntro()">← Back to Overview</button>
+  </div>
+
+  <div class="citation-box">
+    <strong>Sources & References</strong><br>
+    Garrison, R., Noreen, E., & Brewer, P. (2021). <em>Managerial Accounting</em> (17th ed.). McGraw-Hill Education.<br>
+    Horngren, C., Datar, S., & Rajan, M. (2020). <em>Cost Accounting: A Managerial Emphasis</em> (17th ed.). Pearson.<br>
+    Weygandt, J., Kimmel, P., & Kieso, D. (2021). <em>Managerial Accounting</em> (4th ed.). Wiley.<br>
+    All scenario data is fictional and created for educational purposes.
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  QUESTION BANK
+// ═══════════════════════════════════════════════════════════
+const questions = [
+
+// ── CHAPTER 1: Cost Fundamentals ──
+
+{
+  chapter: "Chapter 1", chapterTitle: "Cost Fundamentals",
+  type: "mcq",
+  label: "COST CLASSIFICATION",
+  question: "Meridian's finance team is preparing next quarter's cost model. Which of the following best describes a <strong>fixed cost</strong>?",
+  context: "Meridian manufactures premium water bottles. Its monthly costs include: rent for the factory ($45,000), raw materials ($4.20 per bottle), sales commissions (8% of revenue), and executive salaries ($110,000/year).",
+  answers: [
+    { letter: "A", text: "Raw materials at $4.20 per bottle — cost rises proportionally with each unit produced." },
+    { letter: "B", text: "Factory rent of $45,000/month — total cost stays constant regardless of production volume." },
+    { letter: "C", text: "Sales commissions at 8% of revenue — cost varies directly with sales dollars." },
+    { letter: "D", text: "Utility bills — these increase slightly as the factory runs more machines." }
+  ],
+  correct: 1,
+  feedback: {
+    correct: `<strong>Exactly right.</strong> Factory rent is a textbook fixed cost: the landlord's invoice is $45,000 whether Meridian produces 1,000 bottles or 100,000 bottles. The total amount never changes with volume — only the <em>per-unit</em> share changes (it gets cheaper per bottle as you spread it over more units).<div class="formula">Fixed Cost per Unit = Total Fixed Cost ÷ Units Produced<br>At 10,000 units: $45,000 ÷ 10,000 = $4.50/unit<br>At 45,000 units: $45,000 ÷ 45,000 = $1.00/unit</div><div class="insight"><span class="insight-icon">💡</span> This is why scaling production is so powerful — fixed costs become increasingly diluted per unit, improving margins without changing the cost itself. Understanding fixed cost behavior is the foundation of all CVP analysis.</div>`,
+    wrong: `<strong>Not quite.</strong> The correct answer is <strong>B — Factory rent</strong>. A fixed cost remains constant in <em>total</em> regardless of activity level. Raw materials (A) and sales commissions (C) are variable costs — they scale with volume. Utilities (D) that increase with machine use are mixed or variable costs.<div class="formula">Key Test: If activity doubles and the total cost stays the same → Fixed Cost<br>If activity doubles and the total cost doubles → Variable Cost</div><div class="insight"><span class="insight-icon">💡</span> The distinction matters enormously: if you misclassify a fixed cost as variable, you'll project the wrong profit impact when volume changes — a potentially costly forecasting error.</div>`
+  }
+},
+
+{
+  chapter: "Chapter 1", chapterTitle: "Cost Fundamentals",
+  type: "mcq",
+  label: "VARIABLE COST BEHAVIOR",
+  question: "Meridian's CFO asks: if production increases from 20,000 to 30,000 units next quarter, what happens to the <strong>variable cost per unit</strong>?",
+  context: "Variable costs include raw materials ($4.20/bottle), packaging ($0.80/bottle), and direct labor ($2.00/bottle). Total variable cost = $7.00 per bottle.",
+  answers: [
+    { letter: "A", text: "Variable cost per unit increases — higher production puts cost pressure on suppliers." },
+    { letter: "B", text: "Variable cost per unit decreases — spreading costs over more units reduces the per-unit rate." },
+    { letter: "C", text: "Variable cost per unit stays the same — it's constant by definition, regardless of volume." },
+    { letter: "D", text: "Variable cost per unit is unpredictable — it depends on market conditions." }
+  ],
+  correct: 2,
+  feedback: {
+    correct: `<strong>Correct.</strong> This is the defining characteristic of variable costs: the <em>per-unit rate is constant</em>. At $7.00/bottle, Meridian pays $7.00 whether it makes the 1st bottle or the 100,000th (within the relevant range).<div class="formula">Total Variable Cost = Unit Variable Cost × Volume<br>20,000 units: $7.00 × 20,000 = $140,000<br>30,000 units: $7.00 × 30,000 = $210,000<br>Per-unit rate: $7.00 in both cases ✓</div><div class="insight"><span class="insight-icon">💡</span> Compare this to fixed costs, where the per-unit rate falls as volume rises. Understanding both behaviors lets you model how total costs — and therefore profits — change with any volume scenario.</div>`,
+    wrong: `<strong>The correct answer is C.</strong> Variable cost <em>per unit</em> stays constant within the relevant range — that's precisely what makes it "variable." Total variable cost varies (increases with volume), but the rate per unit does not.<div class="formula">Don't confuse these two concepts:<br>• Total Variable Cost → changes with volume<br>• Variable Cost per Unit → stays constant</div><div class="insight"><span class="insight-icon">💡</span> Answers A and D describe real-world complications (volume discounts, commodity pricing) that accounting models acknowledge but set aside to create predictable, actionable frameworks. B describes how fixed costs behave per unit — not variable costs.</div>`
+  }
+},
+
+{
+  chapter: "Chapter 1", chapterTitle: "Cost Fundamentals",
+  type: "mcq",
+  label: "MIXED COSTS",
+  question: "The factory electricity bill is $8,000/month at zero production and increases by $0.15 per bottle produced. How should this cost be classified?",
+  context: "Understanding cost behavior is critical before building any CVP model. Electricity powers both facility systems (always on) and manufacturing equipment (variable with output).",
+  answers: [
+    { letter: "A", text: "Purely fixed — the $8,000 base makes it a fixed cost." },
+    { letter: "B", text: "Purely variable — any cost that changes with production is variable." },
+    { letter: "C", text: "Mixed (semi-variable) — it has both a fixed component and a variable component." },
+    { letter: "D", text: "Step cost — it jumps in fixed increments at certain production thresholds." }
+  ],
+  correct: 2,
+  feedback: {
+    correct: `<strong>Well done.</strong> Mixed costs — sometimes called semi-variable costs — contain both a fixed portion and a variable portion. Electricity is the classic example:<div class="formula">Total Electricity = $8,000 (fixed) + $0.15 × Units Produced<br>At 20,000 units: $8,000 + $3,000 = $11,000<br>At 40,000 units: $8,000 + $6,000 = $14,000</div>To use this in CVP analysis, accountants separate mixed costs using the <strong>High-Low Method</strong> or <strong>regression analysis</strong> — splitting the fixed and variable components so each can be modeled correctly.<div class="insight"><span class="insight-icon">💡</span> Misclassifying a mixed cost as purely fixed or purely variable will systematically distort your projections. Always examine whether a cost has a baseline plus a usage-driven component.</div>`,
+    wrong: `<strong>The correct answer is C — Mixed cost.</strong> This bill can't be purely fixed (it changes with volume) or purely variable (it has a $8,000 base even at zero production). Costs with both a fixed base and a variable rate are called <em>mixed</em> or <em>semi-variable</em> costs.<div class="formula">General Form: y = Fixed Component + (Variable Rate × Activity)<br>Electricity: y = $8,000 + $0.15x</div><div class="insight"><span class="insight-icon">💡</span> In practice, mixed costs are everywhere: phone bills, salesperson salaries (base + commission), equipment maintenance. Recognizing them prevents forecasting errors that compound as volume scales.</div>`
+  }
+},
+
+{
+  chapter: "Chapter 1", chapterTitle: "Cost Fundamentals",
+  type: "mcq",
+  label: "CONTRIBUTION MARGIN",
+  question: "Meridian sells each water bottle for <strong>$22.00</strong>. Variable costs are <strong>$7.00/unit</strong>. What is the contribution margin per unit — and what does it tell you?",
+  context: "The CFO introduces the concept before the break-even discussion: 'Before we talk about break-even, we need to know what each sale actually contributes toward covering our fixed costs.'",
+  answers: [
+    { letter: "A", text: "$15.00 — the amount each unit contributes toward covering fixed costs and generating profit." },
+    { letter: "B", text: "$7.00 — the variable cost of each unit sold." },
+    { letter: "C", text: "$22.00 — the full selling price before any costs are deducted." },
+    { letter: "D", text: "$15.00 — the net profit per unit after all costs, fixed and variable." }
+  ],
+  correct: 0,
+  feedback: {
+    correct: `<strong>Correct — and the distinction in answer D matters enormously.</strong> The contribution margin is <em>not</em> net profit per unit. It's what each sale contributes toward fixed costs first — only after all fixed costs are covered does it become profit.<div class="formula">Contribution Margin per Unit = Selling Price − Variable Cost per Unit<br>= $22.00 − $7.00 = <strong>$15.00</strong><br><br>CM Ratio = CM per Unit ÷ Selling Price = $15 ÷ $22 ≈ 68.2%</div>The CM ratio is powerful: for every $1.00 in revenue, $0.682 goes toward covering fixed costs (and eventually profit). The other $0.318 reimburses variable costs.<div class="insight"><span class="insight-icon">💡</span> A high CM ratio is the signature of a scalable business — once fixed costs are covered, most of each additional dollar of revenue drops to the bottom line. Think software companies vs. restaurants.</div>`,
+    wrong: `<strong>The correct answer is A.</strong> Contribution Margin = Selling Price − Variable Costs per Unit = $22 − $7 = <strong>$15.00</strong>. Answer D is tempting, but contribution margin is <em>not</em> net profit per unit — it's a stepping stone. Fixed costs still need to be subtracted.<div class="formula">Revenue − Variable Costs = Contribution Margin<br>Contribution Margin − Fixed Costs = Operating Profit<br><br>$22 − $7 = $15 CM → $15 × units − Fixed Costs = Profit</div><div class="insight"><span class="insight-icon">💡</span> Thinking in contribution margin flips the mental model: instead of asking "what does this cost me?" ask "how much does each sale contribute toward the costs I've already committed to?" That's the CVP mindset.</div>`
+  }
+},
+
+// ── CHAPTER 2: Break-Even & CVP ──
+
+{
+  chapter: "Chapter 2", chapterTitle: "Break-Even Analysis",
+  type: "calc",
+  label: "BREAK-EVEN UNITS",
+  question: "Calculate Meridian's <strong>break-even point in units</strong>.",
+  context: "Monthly fixed costs: Factory rent $45,000 + Executive salaries $9,167 + Depreciation $5,000 + Marketing retainer $3,000 = <strong>$62,167 total fixed costs</strong>. Selling price: $22.00. Variable cost per unit: $7.00. Contribution margin per unit: $15.00.",
+  tableData: {
+    headers: ["Item", "Amount"],
+    rows: [
+      ["Selling Price", "$22.00 / unit"],
+      ["Variable Cost", "$7.00 / unit"],
+      ["Contribution Margin", "$15.00 / unit"],
+      ["Total Fixed Costs (monthly)", "$62,167"],
+    ]
+  },
+  inputLabel: "Break-Even Point (units/month):",
+  correctAnswer: 4145,
+  tolerance: 5,
+  hint: "Formula: Break-Even Units = Total Fixed Costs ÷ Contribution Margin per Unit",
+  feedback: {
+    correct: `<strong>Exactly right.</strong> At 4,145 units per month, Meridian's total contribution margin exactly equals its fixed costs — it neither profits nor loses.<div class="formula">Break-Even Units = Fixed Costs ÷ CM per Unit<br>= $62,167 ÷ $15.00 = <strong>4,145 units</strong> (rounded up)<br><br>Verification: 4,145 × $15.00 = $62,175 ≥ $62,167 ✓</div>Below this level, Meridian operates at a loss. Above it, every additional bottle generates $15.00 of pure operating profit (since fixed costs are already covered).<div class="insight"><span class="insight-icon">💡</span> Always round <em>up</em> on break-even units — you need to fully cover fixed costs, so you can't sell a fraction of a bottle. This is a small but important practical detail in exam and real-world settings.</div>`,
+    wrong: `<strong>Let's work through it.</strong> The break-even formula is straightforward:<div class="formula">Break-Even Units = Total Fixed Costs ÷ Contribution Margin per Unit<br>= $62,167 ÷ $15.00 = <strong>4,145 units</strong> (rounded up)</div>Common mistakes: using selling price instead of CM in the denominator, or forgetting to round up. At exactly 4,144 units, you'd still be $15 short of covering fixed costs — so the answer is always the next whole unit up.<div class="insight"><span class="insight-icon">💡</span> The denominator (CM per unit) is the key lever. If Meridian raised its price or cut variable costs, CM goes up and break-even goes down — producing profit faster. This is why pricing strategy and cost control are inseparable from break-even thinking.</div>`
+  }
+},
+
+{
+  chapter: "Chapter 2", chapterTitle: "Break-Even Analysis",
+  type: "calc",
+  label: "BREAK-EVEN IN DOLLARS",
+  question: "The CFO wants to know the break-even point expressed in <strong>monthly revenue dollars</strong>.",
+  context: "Some managers find dollar-based break-even more actionable than units — it translates directly to a revenue target for the sales team. Monthly fixed costs: $62,167. CM Ratio: 68.18% (=$15/$22).",
+  tableData: {
+    headers: ["Variable", "Value"],
+    rows: [
+      ["Total Fixed Costs", "$62,167"],
+      ["CM Ratio (CM ÷ Price)", "68.18%"],
+      ["Method", "Fixed Costs ÷ CM Ratio"]
+    ]
+  },
+  inputLabel: "Break-Even Revenue ($/month):",
+  correctAnswer: 91174,
+  tolerance: 200,
+  hint: "Break-Even $ = Fixed Costs ÷ CM Ratio = $62,167 ÷ 0.6818",
+  feedback: {
+    correct: `<strong>Right on the money.</strong> The CM Ratio method converts break-even from units into dollars directly:<div class="formula">Break-Even Revenue = Fixed Costs ÷ CM Ratio<br>= $62,167 ÷ 0.6818 = <strong>$91,174</strong><br><br>Cross-check: 4,145 units × $22.00 = $91,190 ✓ (minor rounding difference)</div>This means Meridian's sales team needs to generate at least $91,174 in monthly revenue before the company earns a single dollar of profit.<div class="insight"><span class="insight-icon">💡</span> The CM Ratio is especially useful when a company sells multiple products at different price points. Instead of tracking units by SKU, you can analyze total revenue against a blended CM Ratio — a powerful tool for multi-product businesses.</div>`,
+    wrong: `<strong>Here's the approach:</strong><div class="formula">Break-Even Revenue = Fixed Costs ÷ CM Ratio<br>CM Ratio = $15.00 ÷ $22.00 = 0.6818 (68.18%)<br>Break-Even Revenue = $62,167 ÷ 0.6818 = <strong>$91,174</strong></div>Note: This should approximately equal Break-Even Units × Selling Price (4,145 × $22 = $91,190 — the $16 difference is rounding). Both approaches should yield the same answer.<div class="insight"><span class="insight-icon">💡</span> The CM Ratio approach is preferred when you're working with revenue targets rather than unit counts — for example, when setting quarterly sales quotas or evaluating store-level performance.</div>`
+  }
+},
+
+{
+  chapter: "Chapter 2", chapterTitle: "Break-Even Analysis",
+  type: "mcq",
+  label: "MARGIN OF SAFETY",
+  question: "Meridian currently sells 6,200 units/month. Break-even is 4,145 units. What is the <strong>margin of safety</strong> — and what does it mean strategically?",
+  context: "The margin of safety quantifies how much sales can fall before the company hits break-even. It's a key risk metric: larger margin = more buffer against revenue decline.",
+  answers: [
+    { letter: "A", text: "2,055 units or $45,210 — sales can drop by this amount before Meridian reaches break-even. It represents a 33% safety cushion." },
+    { letter: "B", text: "4,145 units — the break-even itself is the margin of safety." },
+    { letter: "C", text: "6,200 units — total current sales define the safety margin." },
+    { letter: "D", text: "2,055 units, but it's meaningless — only break-even matters, not the distance from it." }
+  ],
+  correct: 0,
+  feedback: {
+    correct: `<strong>Correct.</strong> The margin of safety is the cushion between current sales and break-even:<div class="formula">Margin of Safety (Units) = Actual Sales − Break-Even Sales<br>= 6,200 − 4,145 = <strong>2,055 units</strong><br><br>Margin of Safety ($) = 2,055 × $22.00 = <strong>$45,210</strong><br><br>Margin of Safety % = 2,055 ÷ 6,200 = <strong>33.1%</strong></div>A 33% margin means sales could decline by one-third before Meridian starts losing money. Whether that's comfortable depends on industry volatility and competitive dynamics.<div class="insight"><span class="insight-icon">💡</span> During the pandemic, many hospitality businesses discovered they had margin of safety percentages below 10% — a single month of revenue decline wiped out profitability. The margin of safety is your early warning system, not just an accounting metric.</div>`,
+    wrong: `<strong>The correct answer is A.</strong> Margin of Safety = Actual Sales − Break-Even Sales.<div class="formula">= 6,200 − 4,145 = <strong>2,055 units</strong><br>= 2,055 × $22 = <strong>$45,210 in revenue</strong><br>As a %: 2,055 ÷ 6,200 = <strong>33.1%</strong></div>Answer D is conceptually wrong: margin of safety is critical for risk assessment. A business with thin margins needs to know exactly how little room it has before becoming unprofitable. Ignoring it is how companies get caught off-guard by demand downturns.<div class="insight"><span class="insight-icon">💡</span> Boards and lenders often ask for this metric precisely because it reveals financial resilience. A startup with $1M in sales and a $950K break-even has almost no room for error — that's a risky investment profile.</div>`
+  }
+},
+
+{
+  chapter: "Chapter 2", chapterTitle: "Break-Even Analysis",
+  type: "mcq",
+  label: "TARGET PROFIT",
+  question: "The CFO sets a monthly operating profit target of <strong>$30,000</strong>. How many units must Meridian sell to hit that target?",
+  context: "Target profit analysis extends break-even thinking: instead of finding the volume to cover fixed costs alone, you find the volume to cover fixed costs <em>plus</em> a specified profit.",
+  answers: [
+    { letter: "A", text: "4,145 units — the break-even point already achieves this." },
+    { letter: "B", text: "6,145 units — add profit to fixed costs, then divide by CM per unit." },
+    { letter: "C", text: "2,000 units — only profit divided by CM is needed." },
+    { letter: "D", text: "8,478 units — dividing revenue target by CM ratio." }
+  ],
+  correct: 1,
+  feedback: {
+    correct: `<strong>Correct.</strong> Target profit analysis simply adds the desired profit to fixed costs in the numerator:<div class="formula">Target Volume = (Fixed Costs + Target Profit) ÷ CM per Unit<br>= ($62,167 + $30,000) ÷ $15.00<br>= $92,167 ÷ $15.00<br>= <strong>6,145 units</strong> (rounded up)</div>At 6,145 units: Revenue = $135,190 | Variable Costs = $43,015 | CM = $92,175 | Fixed Costs = $62,167 | Profit ≈ $30,008 ✓<div class="insight"><span class="insight-icon">💡</span> This formula is the foundation of sales target-setting in most companies. The sales VP doesn't arbitrarily pick a number — the CFO calculates the volume required to hit the profit plan, and that becomes the quota. Now you know where quotas come from.</div>`,
+    wrong: `<strong>The correct answer is B — 6,145 units.</strong> The key is including the target profit in the formula:<div class="formula">Target Volume = (Fixed Costs + Target Profit) ÷ CM per Unit<br>= ($62,167 + $30,000) ÷ $15.00 = <strong>6,145 units</strong></div>Answer A is wrong because break-even produces $0 profit, not $30,000. Answer C only divides profit by CM — ignoring that fixed costs must be covered first. Answer D uses revenue logic incorrectly.<div class="insight"><span class="insight-icon">💡</span> The logic: each unit first covers its share of variable costs ($7), then contributes $15 toward the pool of fixed costs. Once the entire fixed cost pool is filled ($62,167), the $15 per unit becomes pure profit. You need 2,000 more units beyond break-even to accumulate $30,000 in profit (2,000 × $15 = $30,000).</div>`
+  }
+},
+
+{
+  chapter: "Chapter 2", chapterTitle: "Break-Even Analysis",
+  type: "mcq",
+  label: "CVP GRAPH INTERPRETATION",
+  question: "On a CVP graph, the <strong>break-even point</strong> is located where:",
+  context: "CVP graphs plot total revenue and total cost lines against volume. The visual reveals the loss zone, break-even point, and profit zone at a glance.",
+  answers: [
+    { letter: "A", text: "The total revenue line intersects the variable cost line." },
+    { letter: "B", text: "The total revenue line intersects the total cost line — the point where profit = $0." },
+    { letter: "C", text: "The fixed cost line intersects the variable cost line." },
+    { letter: "D", text: "The total contribution margin line reaches its maximum value." }
+  ],
+  correct: 1,
+  feedback: {
+    correct: `<strong>Correct.</strong> The CVP graph's break-even point is the intersection of two lines:<div class="formula">Total Revenue Line: y = Selling Price × Units = $22x<br>Total Cost Line: y = Fixed Costs + (Variable Cost × Units) = $62,167 + $7x<br><br>At break-even: $22x = $62,167 + $7x → $15x = $62,167 → x = 4,145 units</div>To the <em>left</em> of the intersection: total costs exceed revenue → operating loss. To the <em>right</em>: revenue exceeds total costs → operating profit. The <em>vertical distance</em> between the lines at any volume equals profit (or loss).<div class="insight"><span class="insight-icon">💡</span> The CVP graph is a powerful communication tool: a slide showing total revenue vs. total cost visually conveys financial dynamics to non-accountants in seconds. Learning to read and construct it is a valuable executive communication skill.</div>`,
+    wrong: `<strong>The correct answer is B.</strong> On a CVP graph, break-even is where Total Revenue = Total Cost — the intersection of those two lines. At that exact point, profit is zero.<div class="formula">Left of intersection → Loss zone (costs > revenue)<br>Intersection point → Break-even (profit = $0)<br>Right of intersection → Profit zone (revenue > costs)</div>Answer A is wrong — variable cost and revenue lines don't determine break-even by themselves. Answer C involves fixed costs, which are horizontal (constant). Answer D describes a different concept — contribution margin keeps increasing with volume, it doesn't "maximize" in a CVP context.<div class="insight"><span class="insight-icon">💡</span> The steeper the revenue line relative to the cost line, the faster profits accumulate after break-even. That slope difference is exactly the contribution margin per unit — the visual geometry reflects the math.</div>`
+  }
+},
+
+// ── CHAPTER 3: Strategic Decisions ──
+
+{
+  chapter: "Chapter 3", chapterTitle: "Strategic Decision-Making",
+  type: "mcq",
+  label: "PRICING STRATEGY",
+  question: "A competitor cuts prices. The VP of Sales proposes Meridian drop its price to <strong>$19.00/unit</strong>. How does this affect break-even — and is it the right move?",
+  context: "Current state: Price $22, Variable Cost $7, CM $15, Fixed Costs $62,167, Break-even 4,145 units. Proposed: Price drops to $19. Variable costs unchanged.",
+  answers: [
+    { letter: "A", text: "Break-even drops to ~3,600 units — lower price drives volume and reduces break-even." },
+    { letter: "B", text: "Break-even rises to ~5,197 units — lower price reduces CM, requiring more unit sales to cover the same fixed costs." },
+    { letter: "C", text: "Break-even stays the same — price doesn't affect the break-even calculation, only volume does." },
+    { letter: "D", text: "Break-even drops slightly — the volume increase from lower prices compensates for the smaller margin." }
+  ],
+  correct: 1,
+  feedback: {
+    correct: `<strong>Excellent strategic thinking.</strong> Lower price → lower CM per unit → higher break-even. The math is precise:<div class="formula">New CM per Unit = $19.00 − $7.00 = $12.00<br>New Break-Even = $62,167 ÷ $12.00 = <strong>5,164 units</strong><br><br>Old Break-Even: 4,145 units<br>Additional units needed: 1,019 more (a 25% increase in volume just to break even)</div>The question then becomes: will the $3 price cut generate enough demand increase to cover those extra 1,019 units? That's an elasticity question, not an accounting question — and it's often a losing bet.<div class="insight"><span class="insight-icon">💡</span> This is why price wars are so dangerous: both competitors cut margins and raise their break-even points simultaneously. Rational managers avoid them. CVP analysis makes this trade-off crystal clear — it turns a "feel-good" sales move into an accountable financial decision.</div>`,
+    wrong: `<strong>The correct answer is B.</strong> Price decreases reduce CM, which pushes break-even higher — the opposite of what most salespeople intuit.<div class="formula">New CM = $19 − $7 = $12 (was $15)<br>New Break-Even = $62,167 ÷ $12 = <strong>5,164 units</strong> (was 4,145)<br>That's 1,019 more units needed just to break even.</div>Answer A is backward — lower prices never reduce break-even unless variable costs fall proportionally. Answer C is wrong — selling price is the primary driver of CM, which directly determines break-even.<div class="insight"><span class="insight-icon">💡</span> The CFO's counterproposal should be: before cutting price, estimate the demand increase required to maintain the same profit level. Often it's unrealistically large — and that's exactly what CVP analysis reveals.</div>`
+  }
+},
+
+{
+  chapter: "Chapter 3", chapterTitle: "Strategic Decision-Making",
+  type: "mcq",
+  label: "OPERATING LEVERAGE",
+  question: "Meridian is considering automating production: replace $3 of variable labor cost per unit with a $50,000/month equipment lease (fixed). At current volume of 6,200 units, is this a good decision?",
+  context: "Operating leverage describes the mix of fixed vs. variable costs. High fixed costs = high operating leverage = profits rise faster after break-even, but losses deepen below it.",
+  answers: [
+    { letter: "A", text: "No — adding fixed costs always increases risk and should be avoided." },
+    { letter: "B", text: "Yes — the new structure reduces variable cost and increases CM, generating more profit at 6,200 units." },
+    { letter: "C", text: "Yes, but only if volume exceeds the new, higher break-even point — which needs to be calculated first." },
+    { letter: "D", text: "It doesn't matter — total costs are the same at any volume level." }
+  ],
+  correct: 2,
+  feedback: {
+    correct: `<strong>Correct — and this is sophisticated thinking.</strong> Let's calculate both scenarios at 6,200 units:<div class="formula">Current Structure:<br>CM = $15/unit | Fixed = $62,167 | Profit = (6,200 × $15) − $62,167 = $30,833<br><br>Automated Structure:<br>Variable Cost = $7 − $3 = $4/unit | CM = $22 − $4 = $18/unit<br>Fixed = $62,167 + $50,000 = $112,167<br>New Break-Even = $112,167 ÷ $18 = 6,232 units<br>Profit at 6,200 units = (6,200 × $18) − $112,167 = −$567 (a LOSS)</div>At 6,200 units, automation actually produces a loss. Volume must exceed 6,232 units first — 32 more units. The decision depends entirely on whether that volume is achievable and sustainable.<div class="insight"><span class="insight-icon">💡</span> This is operating leverage in action: the automated company earns more profit per unit after break-even, but has a higher break-even to reach. High leverage = higher upside AND higher downside. The choice should reflect Meridian's confidence in sustained volume growth.</div>`,
+    wrong: `<strong>The correct answer is C — it depends on whether volume exceeds the new break-even.</strong><div class="formula">Automation adds $50,000 fixed cost but saves $3 variable per unit.<br>New CM = $18/unit | New Fixed Costs = $112,167<br>New Break-Even = $112,167 ÷ $18 = <strong>6,232 units</strong><br><br>At 6,200 units: (6,200 × $18) − $112,167 = <strong>−$567 (loss)</strong></div>Answer A is wrong — fixed costs aren't inherently bad; it depends on volume. Answer B sounds right but skips the crucial step of checking break-even. Answer D is demonstrably wrong — cost structure dramatically changes profit sensitivity to volume.<div class="insight"><span class="insight-icon">💡</span> Capital investment decisions like this are evaluated with Operating Leverage = CM ÷ Operating Income. Higher leverage multiplies both profits and losses. The right choice depends on growth trajectory and competitive stability.</div>`
+  }
+},
+
+{
+  chapter: "Chapter 3", chapterTitle: "Strategic Decision-Making",
+  type: "mcq",
+  label: "MULTI-PRODUCT CVP",
+  question: "Meridian launches a premium bottle at $38.00 (VC: $12.00) alongside the standard at $22.00 (VC: $7.00). Products sell in a <strong>3:1 ratio</strong> (standard:premium). Fixed costs remain $62,167. What is the <strong>weighted average CM</strong>?",
+  context: "When a company sells multiple products, CVP analysis uses a 'sales mix' to compute a weighted average contribution margin — the engine of multi-product break-even analysis.",
+  answers: [
+    { letter: "A", text: "$15.00 — only the standard product's CM, since it sells most." },
+    { letter: "B", text: "$18.00 — simple average of $15 + $26 ÷ 2 = $20.50 (incorrect option)." },
+    { letter: "C", text: "$17.75 — weighted average: (3 × $15 + 1 × $26) ÷ 4." },
+    { letter: "D", text: "$26.00 — only the premium product's CM, since it's the more profitable unit." }
+  ],
+  correct: 2,
+  feedback: {
+    correct: `<strong>Excellent.</strong> Weighted average CM accounts for the proportion of each product in the sales mix:<div class="formula">Standard CM = $22 − $7 = $15 | Weight = 3/4 = 75%<br>Premium CM = $38 − $12 = $26 | Weight = 1/4 = 25%<br><br>Weighted Avg CM = (3 × $15 + 1 × $26) ÷ 4<br>= ($45 + $26) ÷ 4 = $71 ÷ 4 = <strong>$17.75</strong><br><br>Multi-Product Break-Even = $62,167 ÷ $17.75 = 3,503 total units<br>(2,627 standard + 876 premium)</div><div class="insight"><span class="insight-icon">💡</span> Sales mix is a hidden profit lever. If Meridian shifts its mix toward the premium product (higher CM), break-even falls and profits rise — even with no price or cost changes. This is why strategic account management and product mix decisions are fundamentally financial decisions.</div>`,
+    wrong: `<strong>The correct answer is C — $17.75.</strong> You must weight each product's CM by its share of total sales:<div class="formula">Standard: CM $15 × 3 units = $45<br>Premium: CM $26 × 1 unit = $26<br>Total: ($45 + $26) ÷ 4 units = <strong>$17.75 weighted average CM</strong></div>Answer A and D each use only one product's CM — ignoring the sales mix entirely. Answer B miscomputes a simple (unweighted) average. Weighted average correctly reflects the actual profit profile of the combined product portfolio.<div class="insight"><span class="insight-icon">💡</span> In real companies, the product/channel mix shift is often the most powerful profit improvement lever — it doesn't require cutting costs or raising prices. Pure financial optimization through strategic selling.</div>`
+  }
 }
+
+]; // end questions
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let chapterScores = { "Chapter 1": {earned:0, total:0}, "Chapter 2": {earned:0, total:0}, "Chapter 3": {earned:0, total:0} };
+
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startGame() {
+  currentQ = 0; score = 0; answered = false;
+  chapterScores = { "Chapter 1": {earned:0, total:0}, "Chapter 2": {earned:0, total:0}, "Chapter 3": {earned:0, total:0} };
+  showScreen('screen-game');
+  renderQuestion();
+}
+
+function showIntro() { showScreen('screen-intro'); }
+function restartGame() { startGame(); }
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER QUESTION
+// ═══════════════════════════════════════════════════════════
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  const pct = (currentQ / questions.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('score-display').textContent = `Score: ${score} pts`;
+  document.getElementById('btn-next').classList.remove('visible');
+
+  let html = `
+    <div class="chapter-header">
+      <span class="chapter-badge">${q.chapter.toUpperCase()}</span>
+      <span class="chapter-title-text">${q.chapterTitle}</span>
+    </div>
+    <div class="card">
+      <div class="card-accent"></div>
+      <div class="scenario-label">📌 ${q.label}</div>
+      <div class="question-text">${q.question}</div>
+      <div class="context-text">${q.context}</div>
+  `;
+
+  if (q.tableData) {
+    html += `<table class="data-table"><thead><tr>`;
+    q.tableData.headers.forEach(h => html += `<th>${h}</th>`);
+    html += `</tr></thead><tbody>`;
+    q.tableData.rows.forEach(r => {
+      html += `<tr>`;
+      r.forEach((cell, i) => html += `<td class="${i>0?'num':''} ${cell.includes('$15') || cell.includes('68') ? 'highlight' : ''}">${cell}</td>`);
+      html += `</tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  if (q.type === 'mcq') {
+    html += `<div class="answers-grid">`;
+    q.answers.forEach((a, i) => {
+      html += `<button class="answer-btn" onclick="checkMCQ(${i})" id="ans-${i}">
+        <span class="answer-letter">Option ${a.letter}</span>${a.text}
+      </button>`;
+    });
+    html += `</div>`;
+  } else if (q.type === 'calc') {
+    html += `
+      <div class="hint-box" id="hint-box">💡 Hint: ${q.hint}</div>
+      <div class="calc-input-wrap">
+        <div class="input-group">
+          <label class="input-label">${q.inputLabel}</label>
+          <input type="number" class="calc-input" id="calc-answer" placeholder="Enter your answer"
+            onkeydown="if(event.key==='Enter') checkCalc()">
+        </div>
+        <div>
+          <button class="btn-primary" onclick="checkCalc()" style="padding:12px 24px;">Check →</button>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="btn-outline" onclick="showHint()" style="font-size:13px; padding:8px 16px;">Need a hint?</button>
+      </div>
+    `;
+  }
+
+  html += `<div class="feedback-box" id="feedback-box"></div>`;
+  html += `</div>`;
+
+  document.getElementById('question-area').innerHTML = html;
+  chapterScores[q.chapter].total += 10;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHECK ANSWERS
+// ═══════════════════════════════════════════════════════════
+function checkMCQ(selected) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQ];
+  const isCorrect = selected === q.correct;
+
+  document.querySelectorAll('.answer-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === selected && !isCorrect) btn.classList.add('wrong');
+  });
+
+  if (isCorrect) {
+    score += 10;
+    chapterScores[q.chapter].earned += 10;
+  }
+
+  showFeedback(isCorrect, q);
+  document.getElementById('score-display').textContent = `Score: ${score} pts`;
+  document.getElementById('btn-next').classList.add('visible');
+}
+
+function checkCalc() {
+  if (answered) return;
+  const q = questions[currentQ];
+  const inp = document.getElementById('calc-answer');
+  const val = parseFloat(inp.value.replace(/,/g,''));
+  if (isNaN(val)) { inp.style.borderColor = 'var(--gold)'; return; }
+
+  answered = true;
+  const isCorrect = Math.abs(val - q.correctAnswer) <= q.tolerance;
+  inp.classList.add(isCorrect ? 'correct' : 'wrong');
+  inp.disabled = true;
+  document.querySelector('.btn-outline').disabled = true;
+
+  if (isCorrect) {
+    score += 10;
+    chapterScores[q.chapter].earned += 10;
+  }
+
+  showFeedback(isCorrect, q);
+  document.getElementById('score-display').textContent = `Score: ${score} pts`;
+  document.getElementById('btn-next').classList.add('visible');
+}
+
+function showHint() {
+  document.getElementById('hint-box').classList.add('visible');
+}
+
+function showFeedback(isCorrect, q) {
+  const fb = document.getElementById('feedback-box');
+  const status = isCorrect ? 'correct' : 'wrong';
+  const icon = isCorrect ? '✓' : '✗';
+  const headline = isCorrect ? 'CORRECT' : 'NOT QUITE';
+  fb.innerHTML = `
+    <div class="feedback-header ${status}">${icon} ${headline}</div>
+    <div class="feedback-body ${status}">${isCorrect ? q.feedback.correct : q.feedback.wrong}</div>
+  `;
+  fb.classList.add('visible');
+  setTimeout(() => fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  NEXT / RESULTS
+// ═══════════════════════════════════════════════════════════
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RESULTS
+// ═══════════════════════════════════════════════════════════
+function showResults() {
+  showScreen('screen-results');
+  const total = questions.length * 10;
+  const pct = score / total;
+
+  let grade, gradeClass, headline, takeaway;
+  if (pct >= 0.90) {
+    grade = 'A'; gradeClass = 'A';
+    headline = "Outstanding. The CFO is impressed — you're ready for the boardroom.";
+    takeaway = "You demonstrated mastery of CVP analysis: you can classify costs, compute contribution margins, determine break-even in multiple formats, assess risk through margin of safety, and evaluate strategic decisions with financial precision. These skills compound over your career — every pricing discussion, investment decision, and budget conversation will be sharper for understanding this framework.";
+  } else if (pct >= 0.75) {
+    grade = 'B'; gradeClass = 'B';
+    headline = "Solid work. You have the fundamentals down — a few concepts worth revisiting.";
+    takeaway = "You understand the core CVP framework but may benefit from reinforcing the strategic application questions (Chapter 3). Focus on how operating leverage, pricing changes, and sales mix each alter the break-even point — these are the most common exam and interview scenarios.";
+  } else if (pct >= 0.60) {
+    grade = 'C'; gradeClass = 'C';
+    headline = "You're building the right intuitions — more practice with the mechanics will sharpen your edge.";
+    takeaway = "The conceptual foundation is forming, but the quantitative application needs work. Prioritize the core formulas: CM per unit, break-even units, break-even dollars, and target profit. Run through each formula until the logic (not just the math) is clear — then the strategic questions will become intuitive.";
+  } else {
+    grade = 'D'; gradeClass = 'D';
+    headline = "The CFO suggests a second look at the material before the board meeting.";
+    takeaway = "CVP analysis connects every unit sold to profit and loss — it's the financial language of operational decision-making. Start with cost classification (fixed vs. variable), then build to contribution margin, then break-even. Each concept is a stepping stone. Revisit the feedback on questions you missed — the explanations are designed to close the gaps.";
+  }
+
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-grade').className = `results-grade ${gradeClass}`;
+  document.getElementById('result-score').textContent = `${score} / ${total} points`;
+  document.getElementById('result-headline').textContent = headline;
+  document.getElementById('result-takeaway').textContent = takeaway;
+
+  // Chapter breakdown
+  let breakdownHTML = '';
+  const chapters = [
+    { key: "Chapter 1", title: "Cost Fundamentals", desc: "Fixed, variable, mixed costs; CM" },
+    { key: "Chapter 2", title: "Break-Even & CVP", desc: "BEP units, BEP$, margin of safety" },
+    { key: "Chapter 3", title: "Strategic Decisions", desc: "Pricing, leverage, multi-product" }
+  ];
+
+  chapters.forEach(ch => {
+    const s = chapterScores[ch.key];
+    const p = s.total > 0 ? s.earned / s.total : 0;
+    let cls = p >= 0.9 ? 'perfect' : p >= 0.7 ? 'good' : p >= 0.5 ? 'ok' : 'low';
+    breakdownHTML += `
+      <div class="result-chapter">
+        <div class="chap-label">${ch.key.toUpperCase()}</div>
+        <div class="chap-title">${ch.title}</div>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">${ch.desc}</div>
+        <div class="chap-score ${cls}">${s.earned} / ${s.total} pts</div>
+        <div class="mini-bar"><div class="mini-fill" style="width:${p*100}%"></div></div>
+      </div>`;
+  });
+  document.getElementById('result-breakdown').innerHTML = breakdownHTML;
+}
+</script>
+</body>
+</html>
