@@ -3,232 +3,264 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MBA Decision Lab</title>
+<title>MBA Accounting Simulator</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
   font-family: Arial;
   background: linear-gradient(135deg, #0c2340, #e87722);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   margin: 0;
 }
 
 .container {
   background: white;
-  padding: 25px;
+  padding: 20px;
   border-radius: 12px;
   width: 95%;
-  max-width: 750px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
-h1, h2 {
-  text-align: center;
+  max-width: 1000px;
+  margin: 20px auto;
 }
 
 .dashboard {
   background: #f4f4f4;
   padding: 10px;
   border-radius: 8px;
-  margin-bottom: 15px;
-  font-size: 14px;
+  margin-bottom: 10px;
 }
 
 button {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   margin-top: 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #0c2340;
   color: white;
-  font-size: 16px;
   cursor: pointer;
-}
-
-button:hover {
-  background: #091a30;
 }
 </style>
 </head>
 
 <body>
-
 <div class="container" id="game"></div>
 
 <script>
-let round = 0;
+
+let round = 1;
+const maxRounds = 8;
+
+let history = { profit: [] };
 
 let state = {
   price: 50,
-  volume: 1000,
   variableCost: 30,
-  fixedCost: 20000,
-  capacity: 1500
+  fixedCost: 10000,
+  inventory: 200,
+  cash: 50000
 };
 
-function calculateProfit() {
-  let revenue = state.price * state.volume;
-  let vc = state.variableCost * state.volume;
-  let cm = revenue - vc;
-  let profit = cm - state.fixedCost;
+function calc(produce, marketing) {
+  let demand = Math.floor(Math.random()*400)+300 + marketing/10;
+  let sold = Math.min(state.inventory, demand);
 
-  return { revenue, vc, cm, profit };
+  let revenue = sold * state.price;
+  let cogs = sold * state.variableCost;
+  let profit = revenue - cogs - state.fixedCost;
+
+  state.inventory += produce - sold;
+  state.cash += profit - produce*state.variableCost - marketing;
+
+  history.profit.push(profit);
+
+  return { revenue, cogs, profit, demand, sold };
 }
 
-const scenarios = [
-
-{
-title: "Pricing Decision",
-desc: "Demand dropped. You can lower price to increase volume.",
-options: [
-{label: "Lower price to $45 (volume +300)", action: () => {state.price=45; state.volume+=300;}, explanation:"Lower price increased demand but reduced CM per unit."},
-{label: "Keep price at $50", action: () => {}, explanation:"Stable pricing maintains margin but limits growth."}
-]
-},
-
-{
-title: "Special Order",
-desc: "A buyer offers $35/unit for 400 units. Capacity available.",
-options: [
-{label: "Accept Order", action: () => {state.volume+=400;}, explanation:"Price > VC → positive contribution margin."},
-{label: "Reject Order", action: () => {}, explanation:"You missed additional profit from idle capacity."}
-]
-},
-
-{
-title: "Cost Structure Change",
-desc: "Automation increases fixed cost but lowers VC.",
-options: [
-{label: "Automate (FC +5000, VC -5)", action: () => {state.fixedCost+=5000; state.variableCost-=5;}, explanation:"Higher FC increases risk but improves margins."},
-{label: "Stay Manual", action: () => {}, explanation:"Lower risk but less scalable."}
-]
-},
-
-{
-title: "Capacity Constraint",
-desc: "You are at full capacity. A new order arrives.",
-options: [
-{label: "Accept low-margin order", action: () => {state.price=40;}, explanation:"You displaced higher-margin sales → bad decision."},
-{label: "Reject order", action: () => {}, explanation:"Correct: capacity should prioritize highest CM."}
-]
-},
-
-{
-title: "Break-even Strategy",
-desc: "You need to reach profitability.",
-options: [
-{label: "Increase volume via marketing (+500 units, FC +2000)", action: () => {state.volume+=500; state.fixedCost+=2000;}, explanation:"Higher volume spreads fixed costs."},
-{label: "Do nothing", action: () => {}, explanation:"Profitability remains unchanged."}
-]
+function cmMetrics() {
+  let cm = state.price - state.variableCost;
+  let ratio = cm / state.price;
+  return { cm, ratio };
 }
 
-];
-
-function showIntro() {
+function intro() {
   document.getElementById("game").innerHTML = `
-    <h1>MBA Decision Lab</h1>
-    <p><b>Your Role:</b> CEO making strategic accounting decisions</p>
+    <h1>MBA Accounting Simulator</h1>
 
-    <h2>Learning Objectives</h2>
+    <h3>Learning Objectives</h3>
     <ul>
       <li>Use contribution margin in decisions</li>
-      <li>Apply break-even thinking dynamically</li>
-      <li>Evaluate relevant vs irrelevant costs</li>
-      <li>Understand capacity constraints</li>
+      <li>Analyze break-even visually</li>
+      <li>Compare decisions vs optimal strategy</li>
     </ul>
 
-    <button onclick="nextRound()">Start Simulation</button>
+    <button onclick="decision()">Start</button>
   `;
 }
 
-function renderDashboard() {
-  let f = calculateProfit();
+function decision() {
+  let cm = cmMetrics();
 
-  return `
+  document.getElementById("game").innerHTML = `
+    <h2>Round ${round}</h2>
+
     <div class="dashboard">
-      Revenue: $${f.revenue} |
-      Variable Cost: $${f.vc} |
-      CM: $${f.cm} |
-      Fixed Cost: $${state.fixedCost} |
-      <b>Profit: $${f.profit}</b>
+      CM per Unit: $${cm.cm} |
+      CM Ratio: ${(cm.ratio*100).toFixed(1)}%
     </div>
+
+    <label>Price:</label>
+    <input id="price" type="number" value="${state.price}">
+
+    <label>Units to Produce:</label>
+    <input id="produce" type="number" value="200">
+
+    <label>Marketing Spend:</label>
+    <input id="marketing" type="number" value="0">
+
+    <button onclick="run()">Run Round</button>
+
+    <canvas id="beChart"></canvas>
   `;
+
+  renderBEChart();
 }
 
-function nextRound() {
-  if (round >= scenarios.length) {
-    endGame();
-    return;
+function renderBEChart() {
+
+  let labels = [];
+  let revenueLine = [];
+  let costLine = [];
+
+  let cm = state.price - state.variableCost;
+
+  for(let i=0;i<=1000;i+=50){
+    labels.push(i);
+    revenueLine.push(i*state.price);
+    costLine.push(state.fixedCost + i*state.variableCost);
   }
 
-  let s = scenarios[round];
-
-  document.getElementById("game").innerHTML = `
-    ${renderDashboard()}
-    <h2>${s.title}</h2>
-    <p>${s.desc}</p>
-
-    ${s.options.map((o,i)=>`
-      <button onclick="choose(${i})">${o.label}</button>
-    `).join("")}
-  `;
+  new Chart(document.getElementById("beChart"), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: "Revenue", data: revenueLine },
+        { label: "Total Cost", data: costLine }
+      ]
+    }
+  });
 }
 
-function choose(i) {
-  let s = scenarios[round];
-  s.options[i].action();
+function run() {
 
-  let f = calculateProfit();
+  let userPrice = Number(document.getElementById("price").value);
+  let produce = Number(document.getElementById("produce").value);
+  let marketing = Number(document.getElementById("marketing").value);
 
-  document.getElementById("game").innerHTML = `
-    <h2>Decision Outcome</h2>
-    <p>${s.options[i].explanation}</p>
+  state.price = userPrice;
 
-    ${renderDashboard()}
+  let result = calc(produce, marketing);
 
-    <button onclick="continueGame()">Next Decision</button>
-  `;
+  let cm = state.price - state.variableCost;
+
+  // Optimal Strategy Logic
+  let optimal = "";
+  if(cm > 20 && result.sold < result.demand) {
+    optimal = "Increase production — you had unmet demand.";
+  } else if(cm < 10) {
+    optimal = "Increase price — margins are too low.";
+  } else if(produce > result.demand) {
+    optimal = "Reduce production — excess inventory ties up cash.";
+  } else {
+    optimal = "Solid strategy — balanced margin and demand.";
+  }
+
+  showResults(result, optimal, userPrice, produce);
 }
 
-function continueGame() {
+function showResults(data, optimal, price, produce) {
+
+  document.getElementById("game").innerHTML = `
+    <h2>Round ${round} Results</h2>
+
+    <div class="dashboard">
+      Revenue: $${Math.round(data.revenue)} |
+      Profit: $${Math.round(data.profit)} |
+      Units Sold: ${data.sold}
+    </div>
+
+    <canvas id="profitChart"></canvas>
+
+    <h3>Decision Feedback</h3>
+    <p><b>Your Decision:</b> Price $${price}, Produced ${produce}</p>
+    <p><b>Optimal Strategy:</b> ${optimal}</p>
+
+    <p>
+    <b>Explanation:</b><br>
+    Strong decisions maximize contribution margin while aligning production with demand.
+    Overproduction wastes cash, while underproduction misses profit opportunities.
+    </p>
+
+    <button onclick="next()">Next Round</button>
+  `;
+
+  new Chart(document.getElementById("profitChart"), {
+    type: 'line',
+    data: {
+      labels: history.profit.map((_, i)=>"R"+(i+1)),
+      datasets: [{ label: "Profit Trend", data: history.profit }]
+    }
+  });
+}
+
+function next() {
   round++;
-  nextRound();
+  if(round > maxRounds) end();
+  else decision();
 }
 
-function endGame() {
-  let f = calculateProfit();
+function end() {
 
-  let message = "Needs Improvement";
-  if (f.profit > 15000) message = "Excellent Strategic Thinking!";
-  else if (f.profit > 5000) message = "Good Performance";
+  let total = history.profit.reduce((a,b)=>a+b,0);
 
   document.getElementById("game").innerHTML = `
     <h1>Simulation Complete</h1>
-    <h2>Final Profit: $${f.profit}</h2>
-    <p>${message}</p>
+    <h2>Total Profit: $${Math.round(total)}</h2>
+
+    <canvas id="finalChart"></canvas>
+
+    <p>
+    Top performers balanced pricing power, cost control, and demand forecasting.
+    </p>
 
     <button onclick="restart()">Play Again</button>
   `;
+
+  new Chart(document.getElementById("finalChart"), {
+    type: 'line',
+    data: {
+      labels: history.profit.map((_, i)=>"R"+(i+1)),
+      datasets: [{ label: "Final Profit", data: history.profit }]
+    }
+  });
 }
 
 function restart() {
-  round = 0;
+  round = 1;
+  history = { profit: [] };
   state = {
     price: 50,
-    volume: 1000,
     variableCost: 30,
-    fixedCost: 20000,
-    capacity: 1500
+    fixedCost: 10000,
+    inventory: 200,
+    cash: 50000
   };
-  showIntro();
+  intro();
 }
 
-showIntro();
-</script>
+intro();
 
+</script>
 </body>
 </html>
