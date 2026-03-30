@@ -1,265 +1,254 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MBA Accounting Simulator</title>
-
+<title>Accounting Game Hub</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
   font-family: Arial;
-  background: linear-gradient(135deg, #0c2340, #e87722);
+  background: #0c2340;
+  color: white;
   margin: 0;
 }
 
 .container {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  width: 95%;
   max-width: 1000px;
-  margin: 20px auto;
+  margin: auto;
+  padding: 20px;
 }
 
-.dashboard {
-  background: #f4f4f4;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
+.card {
+  background: white;
+  color: black;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
 }
 
 button {
   width: 100%;
-  padding: 10px;
-  margin-top: 10px;
+  padding: 12px;
+  margin-top: 8px;
   border: none;
-  border-radius: 6px;
-  background: #0c2340;
+  border-radius: 8px;
+  background: #e87722;
   color: white;
+  font-size: 16px;
   cursor: pointer;
 }
 </style>
 </head>
 
 <body>
-<div class="container" id="game"></div>
+<div class="container" id="app"></div>
 
 <script>
 
-let round = 1;
-const maxRounds = 8;
+function home() {
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h1>Accounting Simulation Lab</h1>
 
-let history = { profit: [] };
+      <p>Learn accounting by running simulations, not memorizing rules.</p>
 
-let state = {
-  price: 50,
-  variableCost: 30,
-  fixedCost: 10000,
-  inventory: 200,
-  cash: 50000
-};
+      <h3>Select a Module</h3>
 
-function calc(produce, marketing) {
-  let demand = Math.floor(Math.random()*400)+300 + marketing/10;
-  let sold = Math.min(state.inventory, demand);
-
-  let revenue = sold * state.price;
-  let cogs = sold * state.variableCost;
-  let profit = revenue - cogs - state.fixedCost;
-
-  state.inventory += produce - sold;
-  state.cash += profit - produce*state.variableCost - marketing;
-
-  history.profit.push(profit);
-
-  return { revenue, cogs, profit, demand, sold };
-}
-
-function cmMetrics() {
-  let cm = state.price - state.variableCost;
-  let ratio = cm / state.price;
-  return { cm, ratio };
-}
-
-function intro() {
-  document.getElementById("game").innerHTML = `
-    <h1>MBA Accounting Simulator</h1>
-
-    <h3>Learning Objectives</h3>
-    <ul>
-      <li>Use contribution margin in decisions</li>
-      <li>Analyze break-even visually</li>
-      <li>Compare decisions vs optimal strategy</li>
-    </ul>
-
-    <button onclick="decision()">Start</button>
-  `;
-}
-
-function decision() {
-  let cm = cmMetrics();
-
-  document.getElementById("game").innerHTML = `
-    <h2>Round ${round}</h2>
-
-    <div class="dashboard">
-      CM per Unit: $${cm.cm} |
-      CM Ratio: ${(cm.ratio*100).toFixed(1)}%
+      <button onclick="financials()">Financial Statements</button>
+      <button onclick="inventory()">Inventory & Cost Behavior</button>
+      <button onclick="breakeven()">Break-even Analysis</button>
+      <button onclick="budget()">Budgeting</button>
+      <button onclick="variance()">Variance Analysis</button>
+      <button onclick="revenue()">Revenue Recognition</button>
+      <button onclick="decision()">Managerial Decision Making</button>
     </div>
-
-    <label>Price:</label>
-    <input id="price" type="number" value="${state.price}">
-
-    <label>Units to Produce:</label>
-    <input id="produce" type="number" value="200">
-
-    <label>Marketing Spend:</label>
-    <input id="marketing" type="number" value="0">
-
-    <button onclick="run()">Run Round</button>
-
-    <canvas id="beChart"></canvas>
   `;
-
-  renderBEChart();
 }
 
-function renderBEChart() {
+//////////////////////////////////////////////////////
+// 1. FINANCIAL STATEMENTS MODULE
+//////////////////////////////////////////////////////
+function financials() {
 
-  let labels = [];
-  let revenueLine = [];
-  let costLine = [];
+  let cash = 10000;
+  let inventory = 0;
+  let revenue = 0;
 
-  let cm = state.price - state.variableCost;
+  function render() {
+    document.getElementById("app").innerHTML = `
+      <div class="card">
+        <h2>Financial Statements Lab</h2>
 
-  for(let i=0;i<=1000;i+=50){
+        <p><b>Goal:</b> Understand how transactions affect statements</p>
+
+        <button onclick="buy()">Buy Inventory ($2,000)</button>
+        <button onclick="sell()">Sell Goods ($3,000)</button>
+
+        <h3>Income Statement</h3>
+        <p>Revenue: $${revenue}</p>
+
+        <h3>Balance Sheet</h3>
+        <p>Cash: $${cash}</p>
+        <p>Inventory: $${inventory}</p>
+      </div>
+    `;
+  }
+
+  window.buy = function() {
+    cash -= 2000;
+    inventory += 2000;
+    render();
+  }
+
+  window.sell = function() {
+    inventory -= 1000;
+    cash += 3000;
+    revenue += 3000;
+    render();
+  }
+
+  render();
+}
+
+//////////////////////////////////////////////////////
+// 2. INVENTORY + COST BEHAVIOR
+//////////////////////////////////////////////////////
+function inventory() {
+
+  let fixed = 5000;
+  let variable = 20;
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Cost Behavior Lab</h2>
+
+      <p>Fixed costs stay constant. Variable costs change per unit.</p>
+
+      <label>Units:</label>
+      <input id="units" type="number" value="100">
+
+      <button onclick="calcCost()">Calculate Cost</button>
+    </div>
+  `;
+}
+
+function calcCost() {
+  let u = Number(document.getElementById("units").value);
+  let total = 5000 + (20 * u);
+
+  alert("Total Cost = $" + total);
+}
+
+//////////////////////////////////////////////////////
+// 3. BREAK-EVEN
+//////////////////////////////////////////////////////
+function breakeven() {
+
+  let price = 50;
+  let vc = 30;
+  let fc = 10000;
+
+  let be = fc / (price - vc);
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Break-even Simulator</h2>
+
+      <p>Break-even units: <b>${be}</b></p>
+
+      <canvas id="chart"></canvas>
+    </div>
+  `;
+
+  let labels=[], rev=[], cost=[];
+  for(let i=0;i<1000;i+=50){
     labels.push(i);
-    revenueLine.push(i*state.price);
-    costLine.push(state.fixedCost + i*state.variableCost);
+    rev.push(i*price);
+    cost.push(fc + i*vc);
   }
 
-  new Chart(document.getElementById("beChart"), {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [
-        { label: "Revenue", data: revenueLine },
-        { label: "Total Cost", data: costLine }
-      ]
-    }
+  new Chart(document.getElementById("chart"), {
+    type:'line',
+    data:{ labels, datasets:[{label:"Revenue",data:rev},{label:"Cost",data:cost}] }
   });
 }
 
-function run() {
+//////////////////////////////////////////////////////
+// 4. BUDGETING
+//////////////////////////////////////////////////////
+function budget() {
 
-  let userPrice = Number(document.getElementById("price").value);
-  let produce = Number(document.getElementById("produce").value);
-  let marketing = Number(document.getElementById("marketing").value);
+  let actual = 12000;
+  let budget = 10000;
 
-  state.price = userPrice;
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Budgeting Challenge</h2>
 
-  let result = calc(produce, marketing);
+      <p>Budget: $${budget}</p>
+      <p>Actual: $${actual}</p>
 
-  let cm = state.price - state.variableCost;
-
-  // Optimal Strategy Logic
-  let optimal = "";
-  if(cm > 20 && result.sold < result.demand) {
-    optimal = "Increase production — you had unmet demand.";
-  } else if(cm < 10) {
-    optimal = "Increase price — margins are too low.";
-  } else if(produce > result.demand) {
-    optimal = "Reduce production — excess inventory ties up cash.";
-  } else {
-    optimal = "Solid strategy — balanced margin and demand.";
-  }
-
-  showResults(result, optimal, userPrice, produce);
-}
-
-function showResults(data, optimal, price, produce) {
-
-  document.getElementById("game").innerHTML = `
-    <h2>Round ${round} Results</h2>
-
-    <div class="dashboard">
-      Revenue: $${Math.round(data.revenue)} |
-      Profit: $${Math.round(data.profit)} |
-      Units Sold: ${data.sold}
+      <p>Were you over or under budget?</p>
     </div>
-
-    <canvas id="profitChart"></canvas>
-
-    <h3>Decision Feedback</h3>
-    <p><b>Your Decision:</b> Price $${price}, Produced ${produce}</p>
-    <p><b>Optimal Strategy:</b> ${optimal}</p>
-
-    <p>
-    <b>Explanation:</b><br>
-    Strong decisions maximize contribution margin while aligning production with demand.
-    Overproduction wastes cash, while underproduction misses profit opportunities.
-    </p>
-
-    <button onclick="next()">Next Round</button>
   `;
-
-  new Chart(document.getElementById("profitChart"), {
-    type: 'line',
-    data: {
-      labels: history.profit.map((_, i)=>"R"+(i+1)),
-      datasets: [{ label: "Profit Trend", data: history.profit }]
-    }
-  });
 }
 
-function next() {
-  round++;
-  if(round > maxRounds) end();
-  else decision();
-}
+//////////////////////////////////////////////////////
+// 5. VARIANCE
+//////////////////////////////////////////////////////
+function variance() {
 
-function end() {
+  let actual = 120;
+  let standard = 100;
 
-  let total = history.profit.reduce((a,b)=>a+b,0);
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Variance Analysis</h2>
 
-  document.getElementById("game").innerHTML = `
-    <h1>Simulation Complete</h1>
-    <h2>Total Profit: $${Math.round(total)}</h2>
+      <p>Actual Units: ${actual}</p>
+      <p>Standard Units: ${standard}</p>
 
-    <canvas id="finalChart"></canvas>
-
-    <p>
-    Top performers balanced pricing power, cost control, and demand forecasting.
-    </p>
-
-    <button onclick="restart()">Play Again</button>
+      <p>Variance: ${actual - standard}</p>
+    </div>
   `;
-
-  new Chart(document.getElementById("finalChart"), {
-    type: 'line',
-    data: {
-      labels: history.profit.map((_, i)=>"R"+(i+1)),
-      datasets: [{ label: "Final Profit", data: history.profit }]
-    }
-  });
 }
 
-function restart() {
-  round = 1;
-  history = { profit: [] };
-  state = {
-    price: 50,
-    variableCost: 30,
-    fixedCost: 10000,
-    inventory: 200,
-    cash: 50000
-  };
-  intro();
+//////////////////////////////////////////////////////
+// 6. REVENUE RECOGNITION
+//////////////////////////////////////////////////////
+function revenue() {
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Revenue Recognition</h2>
+
+      <p>Customer paid but product not delivered.</p>
+
+      <button onclick="alert('Correct: Do NOT recognize revenue yet')">Recognize Revenue</button>
+      <button onclick="alert('Correct: Revenue is deferred')">Defer Revenue</button>
+    </div>
+  `;
 }
 
-intro();
+//////////////////////////////////////////////////////
+// 7. DECISION MAKING
+//////////////////////////////////////////////////////
+function decision() {
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Managerial Decision Lab</h2>
+
+      <p>Special order: Price = $35, VC = $30</p>
+
+      <button onclick="alert('Correct: Accept (positive CM)')">Accept</button>
+      <button onclick="alert('Incorrect: Reject loses profit')">Reject</button>
+    </div>
+  `;
+}
+
+home();
 
 </script>
 </body>
