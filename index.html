@@ -1,285 +1,301 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>MBA Accounting Game</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+import React, { useMemo, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-<style>
-body {
-  font-family: Arial;
-  background: #0c2340;
-  color: white;
-  margin: 0;
-}
+/**
+ * MBA Accounting Master: Interactive Learning Game
+ * Topics: Financial Statements, Break-even, Budgeting, Variance, Revenue Recognition, Inventory
+ */
 
-.container {
-  max-width: 1000px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: white;
-  color: black;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  border: none;
-  border-radius: 6px;
-  background: #e87722;
-  color: white;
-  cursor: pointer;
-}
-</style>
-</head>
-
-<body>
-<div class="container" id="app"></div>
-
-<script>
-
-//////////////////////////////////////////////////////
-// HOME + OBJECTIVES
-//////////////////////////////////////////////////////
-
-function home() {
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h1>Accounting Learning Game</h1>
-
-      <h3>Learning Objectives</h3>
-      <ul>
-        <li>Understand financial statements</li>
-        <li>Apply cost behavior & break-even analysis</li>
-        <li>Analyze budgeting and variance</li>
-        <li>Make managerial accounting decisions</li>
-      </ul>
-
-      <h3>Select Mode</h3>
-      <button onclick="flashcards()">Flashcards</button>
-      <button onclick="quiz()">Multiple Choice</button>
-      <button onclick="fillBlank()">Fill in the Blank</button>
-      <button onclick="simulation()">Simulation Game</button>
-      <button onclick="analysis()">Data Analysis</button>
-    </div>
-  `;
-}
-
-//////////////////////////////////////////////////////
-// FLASHCARDS
-//////////////////////////////////////////////////////
-
-let flashIndex = 0;
-const flashcardsData = [
-  {q:"What is Revenue?", a:"Money earned from sales"},
-  {q:"Contribution Margin?", a:"Price - Variable Cost"},
-  {q:"Break-even formula?", a:"Fixed Cost / CM per unit"},
-  {q:"Variance?", a:"Actual - Budget"},
-  {q:"Inventory?", a:"Goods available for sale"}
+const TOPICS = [
+  {
+    id: "financial_statements",
+    title: "Financial Statements Basics",
+    objective:
+      "Understand the relationship between Income Statement, Balance Sheet, and Cash Flow Statement.",
+    questions: [
+      {
+        prompt:
+          "If a company earns revenue on credit, what happens immediately?",
+        options: [
+          "Cash increases",
+          "Accounts receivable increases",
+          "Liabilities increase",
+          "Equity decreases",
+        ],
+        answer: 1,
+        explanation:
+          "Revenue earned on credit increases Accounts Receivable, not cash. Revenue still increases equity via retained earnings.",
+      },
+      {
+        prompt: "Which statement shows a company's financial position at a point in time?",
+        options: [
+          "Income Statement",
+          "Cash Flow Statement",
+          "Balance Sheet",
+          "Statement of Retained Earnings",
+        ],
+        answer: 2,
+        explanation:
+          "The Balance Sheet presents assets, liabilities, and equity at a specific point in time.",
+      },
+    ],
+  },
+  {
+    id: "break_even",
+    title: "Break-Even Analysis",
+    objective:
+      "Calculate and interpret break-even point using fixed and variable costs.",
+    questions: [
+      {
+        prompt:
+          "A company has fixed costs of $10,000, sells at $50/unit, variable cost $30/unit. Break-even units?",
+        options: ["250 units", "500 units", "400 units", "300 units"],
+        answer: 1,
+        explanation:
+          "Contribution margin = 50 - 30 = 20. Break-even = 10,000 / 20 = 500 units.",
+      },
+      {
+        prompt:
+          "If variable cost increases, break-even point will:",
+        options: ["Decrease", "Increase", "Stay same", "Become zero"],
+        answer: 1,
+        explanation:
+          "Higher variable cost reduces contribution margin, increasing break-even point.",
+      },
+    ],
+  },
+  {
+    id: "budgeting",
+    title: "Budgeting & Forecasting",
+    objective: "Understand static vs flexible budgets and variance interpretation.",
+    questions: [
+      {
+        prompt:
+          "A flexible budget primarily adjusts for:",
+        options: ["Fixed costs", "Activity level changes", "Equity changes", "Depreciation methods"],
+        answer: 1,
+        explanation:
+          "Flexible budgets adjust based on activity levels to improve performance evaluation.",
+      },
+      {
+        prompt:
+          "Which variance is due to difference in production volume?",
+        options: ["Price variance", "Efficiency variance", "Volume variance", "Mix variance"],
+        answer: 2,
+        explanation:
+          "Volume variance arises from differences between planned and actual production volume.",
+      },
+    ],
+  },
+  {
+    id: "revenue_recognition",
+    title: "Revenue Recognition (ASC 606)",
+    objective:
+      "Apply the five-step revenue recognition model in business scenarios.",
+    questions: [
+      {
+        prompt:
+          "Revenue is recognized when:",
+        options: [
+          "Cash is received",
+          "Performance obligation is satisfied",
+          "Invoice is sent",
+          "Contract is signed",
+        ],
+        answer: 1,
+        explanation:
+          "Under ASC 606, revenue is recognized when performance obligations are satisfied.",
+      },
+    ],
+  },
+  {
+    id: "inventory",
+    title: "Inventory Valuation",
+    objective: "Compare FIFO, LIFO, and weighted average methods.",
+    questions: [
+      {
+        prompt:
+          "In rising prices, which method results in higher net income?",
+        options: ["LIFO", "FIFO", "Weighted Average", "All equal"],
+        answer: 1,
+        explanation:
+          "FIFO uses older, cheaper costs first, leading to higher net income in inflation.",
+      },
+    ],
+  },
 ];
 
-function flashcards() {
-  let card = flashcardsData[flashIndex];
-
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Flashcards</h2>
-      <p><b>${card.q}</b></p>
-      <button onclick="alert('${card.a}')">Show Answer</button>
-      <button onclick="nextFlash()">Next</button>
+function ProgressBar({ value }) {
+  return (
+    <div className="w-full bg-gray-200 rounded-full h-2">
+      <div
+        className="bg-blue-600 h-2 rounded-full"
+        style={{ width: `${value}%` }}
+      />
     </div>
-  `;
+  );
 }
 
-function nextFlash() {
-  flashIndex = (flashIndex + 1) % flashcardsData.length;
-  flashcards();
-}
+export default function MBAGame() {
+  const [started, setStarted] = useState(false);
+  const [topicIndex, setTopicIndex] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [answered, setAnswered] = useState(false);
+  const [finished, setFinished] = useState(false);
 
-//////////////////////////////////////////////////////
-// MULTIPLE CHOICE
-//////////////////////////////////////////////////////
+  const currentTopic = TOPICS[topicIndex];
+  const currentQuestion = currentTopic?.questions?.[questionIndex];
 
-function quiz() {
+  const totalQuestions = useMemo(
+    () => TOPICS.reduce((sum, t) => sum + t.questions.length, 0),
+    []
+  );
 
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Multiple Choice</h2>
+  const progress =
+    ((topicIndex * 10 + questionIndex) / totalQuestions) * 100;
 
-      <p>Break-even increases when:</p>
+  const handleAnswer = (idx) => {
+    if (answered) return;
 
-      <button onclick="feedback(false)">Variable cost decreases</button>
-      <button onclick="feedback(true)">Fixed cost increases</button>
+    const correct = idx === currentQuestion.answer;
 
-      <div id="fb"></div>
-    </div>
-  `;
-}
+    setAnswered(true);
 
-function feedback(correct) {
-  document.getElementById("fb").innerHTML = correct
-    ? "<p style='color:green'>Correct! Higher fixed costs require more units.</p>"
-    : "<p style='color:red'>Incorrect. Lower VC reduces break-even.</p>";
-}
+    if (correct) {
+      setScore((s) => s + 1);
+      setFeedback("Correct! " + currentQuestion.explanation);
+    } else {
+      setFeedback(
+        "Incorrect. " + currentQuestion.explanation
+      );
+    }
+  };
 
-//////////////////////////////////////////////////////
-// FILL IN BLANK
-//////////////////////////////////////////////////////
+  const next = () => {
+    setAnswered(false);
+    setFeedback(null);
 
-function fillBlank() {
+    if (questionIndex + 1 < currentTopic.questions.length) {
+      setQuestionIndex(questionIndex + 1);
+    } else if (topicIndex + 1 < TOPICS.length) {
+      setTopicIndex(topicIndex + 1);
+      setQuestionIndex(0);
+    } else {
+      setFinished(true);
+    }
+  };
 
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Fill in the Blank</h2>
-
-      <p>Contribution Margin = Price - ______</p>
-
-      <input id="ans">
-      <button onclick="checkFill()">Submit</button>
-
-      <div id="fillfb"></div>
-    </div>
-  `;
-}
-
-function checkFill() {
-  let ans = document.getElementById("ans").value.toLowerCase();
-
-  if(ans.includes("variable")) {
-    document.getElementById("fillfb").innerHTML =
-      "<p style='color:green'>Correct! Variable cost is subtracted.</p>";
-  } else {
-    document.getElementById("fillfb").innerHTML =
-      "<p style='color:red'>Incorrect. It is variable cost.</p>";
+  if (!started) {
+    return (
+      <div className="p-6 max-w-2xl mx-auto">
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <h1 className="text-2xl font-bold">
+              MBA Accounting Master Game
+            </h1>
+            <p className="text-gray-600">
+              Learn core MBA accounting concepts through interactive
+              scenarios, quizzes, and instant feedback.
+            </p>
+            <ul className="list-disc ml-5 text-sm text-gray-700">
+              <li>Financial Statements Interpretation</li>
+              <li>Break-even & Cost Analysis</li>
+              <li>Budgeting & Variance Analysis</li>
+              <li>Revenue Recognition (ASC 606)</li>
+              <li>Inventory Valuation Methods</li>
+            </ul>
+            <Button onClick={() => setStarted(true)}>
+              Start Learning Journey
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
-}
 
-//////////////////////////////////////////////////////
-// SIMULATION (CORE GAME)
-//////////////////////////////////////////////////////
+  if (finished) {
+    const percentage = Math.round((score / totalQuestions) * 100);
 
-let state = {
-  cash: 20000,
-  inventory: 100,
-  price: 50,
-  variableCost: 25,
-  fixedCost: 4000
-};
+    return (
+      <div className="p-6 max-w-2xl mx-auto">
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <h2 className="text-2xl font-bold">Final Score</h2>
+            <ProgressBar value={percentage} />
+            <p className="text-lg">
+              You scored {score} / {totalQuestions} ({percentage}%)
+            </p>
+            <p className="text-gray-600">
+              {percentage >= 80
+                ? "Excellent mastery of MBA accounting concepts."
+                : percentage >= 50
+                ? "Good understanding, but review key concepts."
+                : "Needs improvement. Revisit learning modules."}
+            </p>
+            <Button
+              onClick={() => {
+                setStarted(false);
+                setTopicIndex(0);
+                setQuestionIndex(0);
+                setScore(0);
+                setFinished(false);
+              }}
+            >
+              Restart Game
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-let history = [];
+  return (
+    <div className="p-4 max-w-3xl mx-auto space-y-4">
+      <Card>
+        <CardContent className="p-4 space-y-2">
+          <h2 className="text-xl font-bold">
+            {currentTopic.title}
+          </h2>
+          <p className="text-sm text-gray-600">
+            Learning Objective: {currentTopic.objective}
+          </p>
+          <ProgressBar value={progress} />
+        </CardContent>
+      </Card>
 
-function simulation() {
+      <Card>
+        <CardContent className="p-4 space-y-4">
+          <h3 className="font-semibold">
+            Question {questionIndex + 1}
+          </h3>
+          <p>{currentQuestion.prompt}</p>
 
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Simulation</h2>
+          <div className="grid gap-2">
+            {currentQuestion.options.map((opt, idx) => (
+              <Button
+                key={idx}
+                variant="outline"
+                onClick={() => handleAnswer(idx)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
 
-      <p>Cash: $${state.cash} | Inventory: ${state.inventory}</p>
+          {feedback && (
+            <div className="p-3 bg-gray-100 rounded-md text-sm">
+              {feedback}
+            </div>
+          )}
 
-      <button onclick="buy()">Buy Inventory</button>
-      <button onclick="raisePrice()">Increase Price</button>
-      <button onclick="runSim()">Run Period</button>
+          {answered && (
+            <Button onClick={next}>Next</Button>
+          )}
+        </CardContent>
+      </Card>
     </div>
-  `;
+  );
 }
-
-function buy() {
-  state.inventory += 100;
-  state.cash -= 2500;
-  simulation();
-}
-
-function raisePrice() {
-  state.price += 5;
-  simulation();
-}
-
-function runSim() {
-
-  let demand = Math.floor(Math.random()*200)+100;
-  let sold = Math.min(state.inventory, demand);
-
-  let revenue = sold * state.price;
-  let cost = sold * state.variableCost + state.fixedCost;
-
-  let profit = revenue - cost;
-
-  state.cash += profit;
-  state.inventory -= sold;
-
-  history.push(profit);
-
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Results</h2>
-
-      <p>Revenue: $${revenue}</p>
-      <p>Cost: $${cost}</p>
-      <p><b>Profit: $${profit}</b></p>
-
-      <p>
-      Profit depends on contribution margin and volume.
-      </p>
-
-      <canvas id="chart"></canvas>
-
-      <button onclick="simulation()">Continue</button>
-    </div>
-  `;
-
-  new Chart(document.getElementById("chart"), {
-    type:'line',
-    data:{
-      labels:history.map((_,i)=>"R"+(i+1)),
-      datasets:[{label:"Profit", data:history}]
-    }
-  });
-}
-
-//////////////////////////////////////////////////////
-// DATA ANALYSIS MODE
-//////////////////////////////////////////////////////
-
-function analysis() {
-
-  let revenue = [5000,7000,8000];
-  let cost = [4000,5000,6000];
-
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Data Analysis</h2>
-
-      <p>Interpret the chart below.</p>
-
-      <canvas id="analysisChart"></canvas>
-
-      <p>
-      Insight: Profit increases when revenue grows faster than cost.
-      </p>
-    </div>
-  `;
-
-  new Chart(document.getElementById("analysisChart"), {
-    type:'bar',
-    data:{
-      labels:["Q1","Q2","Q3"],
-      datasets:[
-        {label:"Revenue", data:revenue},
-        {label:"Cost", data:cost}
-      ]
-    }
-  });
-}
-
-home();
-
-</script>
-</body>
-</html>
