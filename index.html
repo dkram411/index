@@ -2,15 +2,15 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Accounting Game Hub</title>
+<title>Accounting Simulation Lab</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-  font-family: Arial;
+  font-family: 'Segoe UI', Arial;
   background: #0c2340;
-  color: white;
   margin: 0;
+  color: white;
 }
 
 .container {
@@ -19,237 +19,234 @@ body {
   padding: 20px;
 }
 
+.header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
 .card {
   background: white;
   color: black;
   padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 15px;
+  border-radius: 12px;
+}
+
+.full {
+  grid-column: span 2;
 }
 
 button {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   margin-top: 8px;
   border: none;
   border-radius: 8px;
   background: #e87722;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
 }
 </style>
 </head>
 
 <body>
+
 <div class="container" id="app"></div>
 
 <script>
 
-function home() {
+let state = {
+  cash: 20000,
+  inventory: 100,
+  price: 50,
+  variableCost: 25,
+  fixedCost: 4000,
+  loan: 5000
+};
+
+let history = [];
+let round = 1;
+let stage = 1;
+
+function render() {
+
   document.getElementById("app").innerHTML = `
-    <div class="card">
+    <div class="header">
       <h1>Accounting Simulation Lab</h1>
+      <p>Run a business. Learn accounting through decisions.</p>
+    </div>
 
-      <p>Learn accounting by running simulations, not memorizing rules.</p>
+    <div class="grid">
 
-      <h3>Select a Module</h3>
+      <div class="card">
+        <h3>📊 Financial Dashboard</h3>
+        <div class="metric"><span>Cash</span><span>$${state.cash}</span></div>
+        <div class="metric"><span>Inventory</span><span>${state.inventory}</span></div>
+        <div class="metric"><span>Price</span><span>$${state.price}</span></div>
+        <div class="metric"><span>Variable Cost</span><span>$${state.variableCost}</span></div>
+      </div>
 
-      <button onclick="financials()">Financial Statements</button>
-      <button onclick="inventory()">Inventory & Cost Behavior</button>
-      <button onclick="breakeven()">Break-even Analysis</button>
-      <button onclick="budget()">Budgeting</button>
-      <button onclick="variance()">Variance Analysis</button>
-      <button onclick="revenue()">Revenue Recognition</button>
-      <button onclick="decision()">Managerial Decision Making</button>
+      <div class="card">
+        <h3>🧠 Narration</h3>
+        <p>${getNarration()}</p>
+      </div>
+
+      <div class="card">
+        <h3>⚙️ Your Decisions</h3>
+        <button onclick="buyInventory()">Buy Inventory (+100 units)</button>
+        <button onclick="increasePrice()">Increase Price (+$5)</button>
+        <button onclick="decreasePrice()">Decrease Price (-$5)</button>
+        <button onclick="marketing()">Marketing Spend ($1,000)</button>
+        <button onclick="run()">Run Quarter</button>
+      </div>
+
+      <div class="card">
+        <h3>📘 Concepts</h3>
+        <p><b>Contribution Margin:</b> Price - Variable Cost</p>
+        <p><b>Profit:</b> Revenue - Total Costs</p>
+        <p><b>Break-even:</b> When profit = 0</p>
+      </div>
+
+      <div class="card full">
+        <h3>📈 Performance Trend</h3>
+        <canvas id="chart"></canvas>
+      </div>
+
     </div>
   `;
+
+  renderChart();
 }
 
-//////////////////////////////////////////////////////
-// 1. FINANCIAL STATEMENTS MODULE
-//////////////////////////////////////////////////////
-function financials() {
+function getNarration() {
 
-  let cash = 10000;
-  let inventory = 0;
-  let revenue = 0;
+  let cm = state.price - state.variableCost;
 
-  function render() {
-    document.getElementById("app").innerHTML = `
-      <div class="card">
-        <h2>Financial Statements Lab</h2>
-
-        <p><b>Goal:</b> Understand how transactions affect statements</p>
-
-        <button onclick="buy()">Buy Inventory ($2,000)</button>
-        <button onclick="sell()">Sell Goods ($3,000)</button>
-
-        <h3>Income Statement</h3>
-        <p>Revenue: $${revenue}</p>
-
-        <h3>Balance Sheet</h3>
-        <p>Cash: $${cash}</p>
-        <p>Inventory: $${inventory}</p>
-      </div>
-    `;
+  if(round === 1) {
+    return "Welcome! Start by making basic operating decisions like buying inventory and setting price.";
   }
 
-  window.buy = function() {
-    cash -= 2000;
-    inventory += 2000;
-    render();
+  if(cm < 10) {
+    return "Your margins are low. Consider increasing price or reducing costs.";
   }
 
-  window.sell = function() {
-    inventory -= 1000;
-    cash += 3000;
-    revenue += 3000;
-    render();
+  if(state.inventory > 300) {
+    return "You are holding too much inventory. This ties up cash unnecessarily.";
   }
 
+  return "You're balancing operations well. Focus on aligning production with demand.";
+}
+
+function buyInventory() {
+  state.inventory += 100;
+  state.cash -= 2500;
   render();
 }
 
-//////////////////////////////////////////////////////
-// 2. INVENTORY + COST BEHAVIOR
-//////////////////////////////////////////////////////
-function inventory() {
-
-  let fixed = 5000;
-  let variable = 20;
-
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Cost Behavior Lab</h2>
-
-      <p>Fixed costs stay constant. Variable costs change per unit.</p>
-
-      <label>Units:</label>
-      <input id="units" type="number" value="100">
-
-      <button onclick="calcCost()">Calculate Cost</button>
-    </div>
-  `;
+function increasePrice() {
+  state.price += 5;
+  render();
 }
 
-function calcCost() {
-  let u = Number(document.getElementById("units").value);
-  let total = 5000 + (20 * u);
-
-  alert("Total Cost = $" + total);
+function decreasePrice() {
+  state.price -= 5;
+  render();
 }
 
-//////////////////////////////////////////////////////
-// 3. BREAK-EVEN
-//////////////////////////////////////////////////////
-function breakeven() {
+function marketing() {
+  state.cash -= 1000;
+  state.marketing = 100;
+  render();
+}
 
-  let price = 50;
-  let vc = 30;
-  let fc = 10000;
+function run() {
 
-  let be = fc / (price - vc);
+  let demand = Math.floor(Math.random()*200)+100 + (state.marketing || 0);
+
+  let sold = Math.min(state.inventory, demand);
+
+  let revenue = sold * state.price;
+  let cost = sold * state.variableCost + state.fixedCost;
+
+  let profit = revenue - cost;
+
+  state.cash += profit;
+  state.inventory -= sold;
+
+  history.push(profit);
+
+  showResults(revenue, cost, profit, sold, demand);
+}
+
+function showResults(revenue, cost, profit, sold, demand) {
 
   document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Break-even Simulator</h2>
+    <div class="container">
 
-      <p>Break-even units: <b>${be}</b></p>
+      <div class="card">
+        <h2>📊 Results (Round ${round})</h2>
 
-      <canvas id="chart"></canvas>
+        <p><b>Units Sold:</b> ${sold} (Demand: ${demand})</p>
+
+        <h3>Income Statement</h3>
+        <p>Revenue: $${revenue}</p>
+        <p>Expenses: $${cost}</p>
+        <p><b>Profit:</b> $${profit}</p>
+
+        <h3>💡 Insight</h3>
+        <p>
+        Profit depends on contribution margin and volume.
+        If demand exceeds supply, you missed sales.
+        If inventory is too high, you tied up cash.
+        </p>
+
+        <button onclick="next()">Next Round</button>
+      </div>
+
     </div>
   `;
 
-  let labels=[], rev=[], cost=[];
-  for(let i=0;i<1000;i+=50){
-    labels.push(i);
-    rev.push(i*price);
-    cost.push(fc + i*vc);
-  }
+  round++;
+}
+
+function next() {
+  render();
+}
+
+function renderChart() {
+  if(!document.getElementById("chart")) return;
 
   new Chart(document.getElementById("chart"), {
-    type:'line',
-    data:{ labels, datasets:[{label:"Revenue",data:rev},{label:"Cost",data:cost}] }
+    type: 'line',
+    data: {
+      labels: history.map((_,i)=>"R"+(i+1)),
+      datasets: [{
+        label: "Profit Trend",
+        data: history
+      }]
+    }
   });
 }
 
-//////////////////////////////////////////////////////
-// 4. BUDGETING
-//////////////////////////////////////////////////////
-function budget() {
-
-  let actual = 12000;
-  let budget = 10000;
-
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Budgeting Challenge</h2>
-
-      <p>Budget: $${budget}</p>
-      <p>Actual: $${actual}</p>
-
-      <p>Were you over or under budget?</p>
-    </div>
-  `;
-}
-
-//////////////////////////////////////////////////////
-// 5. VARIANCE
-//////////////////////////////////////////////////////
-function variance() {
-
-  let actual = 120;
-  let standard = 100;
-
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Variance Analysis</h2>
-
-      <p>Actual Units: ${actual}</p>
-      <p>Standard Units: ${standard}</p>
-
-      <p>Variance: ${actual - standard}</p>
-    </div>
-  `;
-}
-
-//////////////////////////////////////////////////////
-// 6. REVENUE RECOGNITION
-//////////////////////////////////////////////////////
-function revenue() {
-
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Revenue Recognition</h2>
-
-      <p>Customer paid but product not delivered.</p>
-
-      <button onclick="alert('Correct: Do NOT recognize revenue yet')">Recognize Revenue</button>
-      <button onclick="alert('Correct: Revenue is deferred')">Defer Revenue</button>
-    </div>
-  `;
-}
-
-//////////////////////////////////////////////////////
-// 7. DECISION MAKING
-//////////////////////////////////////////////////////
-function decision() {
-
-  document.getElementById("app").innerHTML = `
-    <div class="card">
-      <h2>Managerial Decision Lab</h2>
-
-      <p>Special order: Price = $35, VC = $30</p>
-
-      <button onclick="alert('Correct: Accept (positive CM)')">Accept</button>
-      <button onclick="alert('Incorrect: Reject loses profit')">Reject</button>
-    </div>
-  `;
-}
-
-home();
+render();
 
 </script>
+
 </body>
 </html>
