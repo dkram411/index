@@ -2,15 +2,15 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Accounting Simulation Lab</title>
+<title>MBA Accounting Game</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-  font-family: 'Segoe UI', Arial;
+  font-family: Arial;
   background: #0c2340;
-  margin: 0;
   color: white;
+  margin: 0;
 }
 
 .container {
@@ -19,26 +19,12 @@ body {
   padding: 20px;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-}
-
 .card {
   background: white;
   color: black;
   padding: 15px;
-  border-radius: 12px;
-}
-
-.full {
-  grid-column: span 2;
+  border-radius: 10px;
+  margin-bottom: 15px;
 }
 
 button {
@@ -46,139 +32,178 @@ button {
   padding: 10px;
   margin-top: 8px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #e87722;
   color: white;
-  font-size: 15px;
   cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-.metric {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
 }
 </style>
 </head>
 
 <body>
-
 <div class="container" id="app"></div>
 
 <script>
+
+//////////////////////////////////////////////////////
+// HOME + OBJECTIVES
+//////////////////////////////////////////////////////
+
+function home() {
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h1>Accounting Learning Game</h1>
+
+      <h3>Learning Objectives</h3>
+      <ul>
+        <li>Understand financial statements</li>
+        <li>Apply cost behavior & break-even analysis</li>
+        <li>Analyze budgeting and variance</li>
+        <li>Make managerial accounting decisions</li>
+      </ul>
+
+      <h3>Select Mode</h3>
+      <button onclick="flashcards()">Flashcards</button>
+      <button onclick="quiz()">Multiple Choice</button>
+      <button onclick="fillBlank()">Fill in the Blank</button>
+      <button onclick="simulation()">Simulation Game</button>
+      <button onclick="analysis()">Data Analysis</button>
+    </div>
+  `;
+}
+
+//////////////////////////////////////////////////////
+// FLASHCARDS
+//////////////////////////////////////////////////////
+
+let flashIndex = 0;
+const flashcardsData = [
+  {q:"What is Revenue?", a:"Money earned from sales"},
+  {q:"Contribution Margin?", a:"Price - Variable Cost"},
+  {q:"Break-even formula?", a:"Fixed Cost / CM per unit"},
+  {q:"Variance?", a:"Actual - Budget"},
+  {q:"Inventory?", a:"Goods available for sale"}
+];
+
+function flashcards() {
+  let card = flashcardsData[flashIndex];
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Flashcards</h2>
+      <p><b>${card.q}</b></p>
+      <button onclick="alert('${card.a}')">Show Answer</button>
+      <button onclick="nextFlash()">Next</button>
+    </div>
+  `;
+}
+
+function nextFlash() {
+  flashIndex = (flashIndex + 1) % flashcardsData.length;
+  flashcards();
+}
+
+//////////////////////////////////////////////////////
+// MULTIPLE CHOICE
+//////////////////////////////////////////////////////
+
+function quiz() {
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Multiple Choice</h2>
+
+      <p>Break-even increases when:</p>
+
+      <button onclick="feedback(false)">Variable cost decreases</button>
+      <button onclick="feedback(true)">Fixed cost increases</button>
+
+      <div id="fb"></div>
+    </div>
+  `;
+}
+
+function feedback(correct) {
+  document.getElementById("fb").innerHTML = correct
+    ? "<p style='color:green'>Correct! Higher fixed costs require more units.</p>"
+    : "<p style='color:red'>Incorrect. Lower VC reduces break-even.</p>";
+}
+
+//////////////////////////////////////////////////////
+// FILL IN BLANK
+//////////////////////////////////////////////////////
+
+function fillBlank() {
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Fill in the Blank</h2>
+
+      <p>Contribution Margin = Price - ______</p>
+
+      <input id="ans">
+      <button onclick="checkFill()">Submit</button>
+
+      <div id="fillfb"></div>
+    </div>
+  `;
+}
+
+function checkFill() {
+  let ans = document.getElementById("ans").value.toLowerCase();
+
+  if(ans.includes("variable")) {
+    document.getElementById("fillfb").innerHTML =
+      "<p style='color:green'>Correct! Variable cost is subtracted.</p>";
+  } else {
+    document.getElementById("fillfb").innerHTML =
+      "<p style='color:red'>Incorrect. It is variable cost.</p>";
+  }
+}
+
+//////////////////////////////////////////////////////
+// SIMULATION (CORE GAME)
+//////////////////////////////////////////////////////
 
 let state = {
   cash: 20000,
   inventory: 100,
   price: 50,
   variableCost: 25,
-  fixedCost: 4000,
-  loan: 5000
+  fixedCost: 4000
 };
 
 let history = [];
-let round = 1;
-let stage = 1;
 
-function render() {
+function simulation() {
 
   document.getElementById("app").innerHTML = `
-    <div class="header">
-      <h1>Accounting Simulation Lab</h1>
-      <p>Run a business. Learn accounting through decisions.</p>
-    </div>
+    <div class="card">
+      <h2>Simulation</h2>
 
-    <div class="grid">
+      <p>Cash: $${state.cash} | Inventory: ${state.inventory}</p>
 
-      <div class="card">
-        <h3>📊 Financial Dashboard</h3>
-        <div class="metric"><span>Cash</span><span>$${state.cash}</span></div>
-        <div class="metric"><span>Inventory</span><span>${state.inventory}</span></div>
-        <div class="metric"><span>Price</span><span>$${state.price}</span></div>
-        <div class="metric"><span>Variable Cost</span><span>$${state.variableCost}</span></div>
-      </div>
-
-      <div class="card">
-        <h3>🧠 Narration</h3>
-        <p>${getNarration()}</p>
-      </div>
-
-      <div class="card">
-        <h3>⚙️ Your Decisions</h3>
-        <button onclick="buyInventory()">Buy Inventory (+100 units)</button>
-        <button onclick="increasePrice()">Increase Price (+$5)</button>
-        <button onclick="decreasePrice()">Decrease Price (-$5)</button>
-        <button onclick="marketing()">Marketing Spend ($1,000)</button>
-        <button onclick="run()">Run Quarter</button>
-      </div>
-
-      <div class="card">
-        <h3>📘 Concepts</h3>
-        <p><b>Contribution Margin:</b> Price - Variable Cost</p>
-        <p><b>Profit:</b> Revenue - Total Costs</p>
-        <p><b>Break-even:</b> When profit = 0</p>
-      </div>
-
-      <div class="card full">
-        <h3>📈 Performance Trend</h3>
-        <canvas id="chart"></canvas>
-      </div>
-
+      <button onclick="buy()">Buy Inventory</button>
+      <button onclick="raisePrice()">Increase Price</button>
+      <button onclick="runSim()">Run Period</button>
     </div>
   `;
-
-  renderChart();
 }
 
-function getNarration() {
-
-  let cm = state.price - state.variableCost;
-
-  if(round === 1) {
-    return "Welcome! Start by making basic operating decisions like buying inventory and setting price.";
-  }
-
-  if(cm < 10) {
-    return "Your margins are low. Consider increasing price or reducing costs.";
-  }
-
-  if(state.inventory > 300) {
-    return "You are holding too much inventory. This ties up cash unnecessarily.";
-  }
-
-  return "You're balancing operations well. Focus on aligning production with demand.";
-}
-
-function buyInventory() {
+function buy() {
   state.inventory += 100;
   state.cash -= 2500;
-  render();
+  simulation();
 }
 
-function increasePrice() {
+function raisePrice() {
   state.price += 5;
-  render();
+  simulation();
 }
 
-function decreasePrice() {
-  state.price -= 5;
-  render();
-}
+function runSim() {
 
-function marketing() {
-  state.cash -= 1000;
-  state.marketing = 100;
-  render();
-}
-
-function run() {
-
-  let demand = Math.floor(Math.random()*200)+100 + (state.marketing || 0);
-
+  let demand = Math.floor(Math.random()*200)+100;
   let sold = Math.min(state.inventory, demand);
 
   let revenue = sold * state.price;
@@ -191,62 +216,70 @@ function run() {
 
   history.push(profit);
 
-  showResults(revenue, cost, profit, sold, demand);
-}
-
-function showResults(revenue, cost, profit, sold, demand) {
-
   document.getElementById("app").innerHTML = `
-    <div class="container">
+    <div class="card">
+      <h2>Results</h2>
 
-      <div class="card">
-        <h2>📊 Results (Round ${round})</h2>
+      <p>Revenue: $${revenue}</p>
+      <p>Cost: $${cost}</p>
+      <p><b>Profit: $${profit}</b></p>
 
-        <p><b>Units Sold:</b> ${sold} (Demand: ${demand})</p>
+      <p>
+      Profit depends on contribution margin and volume.
+      </p>
 
-        <h3>Income Statement</h3>
-        <p>Revenue: $${revenue}</p>
-        <p>Expenses: $${cost}</p>
-        <p><b>Profit:</b> $${profit}</p>
+      <canvas id="chart"></canvas>
 
-        <h3>💡 Insight</h3>
-        <p>
-        Profit depends on contribution margin and volume.
-        If demand exceeds supply, you missed sales.
-        If inventory is too high, you tied up cash.
-        </p>
-
-        <button onclick="next()">Next Round</button>
-      </div>
-
+      <button onclick="simulation()">Continue</button>
     </div>
   `;
 
-  round++;
-}
-
-function next() {
-  render();
-}
-
-function renderChart() {
-  if(!document.getElementById("chart")) return;
-
   new Chart(document.getElementById("chart"), {
-    type: 'line',
-    data: {
-      labels: history.map((_,i)=>"R"+(i+1)),
-      datasets: [{
-        label: "Profit Trend",
-        data: history
-      }]
+    type:'line',
+    data:{
+      labels:history.map((_,i)=>"R"+(i+1)),
+      datasets:[{label:"Profit", data:history}]
     }
   });
 }
 
-render();
+//////////////////////////////////////////////////////
+// DATA ANALYSIS MODE
+//////////////////////////////////////////////////////
+
+function analysis() {
+
+  let revenue = [5000,7000,8000];
+  let cost = [4000,5000,6000];
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2>Data Analysis</h2>
+
+      <p>Interpret the chart below.</p>
+
+      <canvas id="analysisChart"></canvas>
+
+      <p>
+      Insight: Profit increases when revenue grows faster than cost.
+      </p>
+    </div>
+  `;
+
+  new Chart(document.getElementById("analysisChart"), {
+    type:'bar',
+    data:{
+      labels:["Q1","Q2","Q3"],
+      datasets:[
+        {label:"Revenue", data:revenue},
+        {label:"Cost", data:cost}
+      ]
+    }
+  });
+}
+
+home();
 
 </script>
-
 </body>
 </html>
