@@ -96,13 +96,6 @@
     font-weight: 500;
     letter-spacing: .05em;
   }
-  .progress-ring-wrap {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    color: var(--slate);
-    font-size: .8rem;
-  }
  
   /* ── SCREENS ── */
   .screen { display: none; }
@@ -269,6 +262,52 @@
     line-height: 1.5;
   }
  
+  /* ── MODULE 6 CALLOUT CARD ── */
+  .module6-callout {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a3a6b 100%);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 14px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: 0 4px 24px rgba(10,22,40,0.2);
+  }
+  .module6-callout::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.08);
+    pointer-events: none;
+  }
+  .module6-callout:hover {
+    border-color: var(--gold);
+    box-shadow: 0 8px 32px rgba(201,168,76,0.2);
+    transform: translateX(4px);
+  }
+  .module6-callout .module-num {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .module6-callout .module-info h4 { color: var(--gold-light); }
+  .module6-callout .module-info p  { color: rgba(255,255,255,0.55); }
+  .m6-badge {
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    background: rgba(201,168,76,0.2);
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.35);
+    white-space: nowrap;
+  }
+ 
   .modules-list {
     display: flex;
     flex-direction: column;
@@ -322,11 +361,12 @@
     padding: .25rem .7rem;
     border-radius: 20px;
   }
-  .tag-fs { background: #e8f4fd; color: #2980b9; }
+  .tag-fs  { background: #e8f4fd; color: #2980b9; }
   .tag-fsa { background: #e8fdf0; color: #27ae60; }
-  .tag-cb { background: #fdf4e8; color: #e67e22; }
-  .tag-be { background: #fde8f4; color: #8e44ad; }
-  .tag-bv { background: #e8fdf8; color: #16a085; }
+  .tag-cb  { background: #fdf4e8; color: #e67e22; }
+  .tag-be  { background: #fde8f4; color: #8e44ad; }
+  .tag-bv  { background: #e8fdf8; color: #16a085; }
+  .tag-dm  { background: #f0e8fd; color: #6c3483; }
  
   .start-area {
     text-align: center;
@@ -387,10 +427,7 @@
     color: var(--text-light);
     white-space: nowrap;
   }
-  .lives-row {
-    display: flex;
-    gap: .3rem;
-  }
+  .lives-row { display: flex; gap: .3rem; }
   .life { font-size: 1rem; transition: opacity .3s; }
   .life.lost { opacity: .25; filter: grayscale(1); }
  
@@ -435,6 +472,22 @@
     line-height: 1.75;
   }
   .scenario-text strong { color: var(--gold-light); }
+ 
+  /* Module 6 scenario accent */
+  .scenario-box.m6-scenario {
+    background: linear-gradient(135deg, #0a1628 0%, #1a3060 100%);
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+  .scenario-box.m6-scenario::after {
+    content: '🏦 INVESTMENT COMMITTEE';
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: rgba(201,168,76,0.5);
+  }
  
   /* Data table */
   .data-table-wrap {
@@ -533,9 +586,7 @@
     background: #fdedec;
     color: var(--red-dark);
   }
-  .option-btn.dimmed {
-    opacity: .45;
-  }
+  .option-btn.dimmed { opacity: .45; }
   .option-btn:disabled { cursor: default; }
   .option-letter {
     width: 28px; height: 28px; flex-shrink: 0;
@@ -549,7 +600,7 @@
     transition: background .18s;
   }
   .option-btn.correct .option-letter { background: var(--green); color: white; }
-  .option-btn.wrong .option-letter { background: var(--red); color: white; }
+  .option-btn.wrong .option-letter   { background: var(--red);   color: white; }
  
   /* Numeric input */
   .numeric-input-wrap {
@@ -573,7 +624,7 @@
   }
   .numeric-input:focus { border-color: var(--gold); }
   .numeric-input.correct { border-color: var(--green); background: #eafaf1; }
-  .numeric-input.wrong { border-color: var(--red); background: #fdedec; }
+  .numeric-input.wrong   { border-color: var(--red);   background: #fdedec; }
   .btn-submit {
     background: var(--navy);
     color: var(--gold);
@@ -605,14 +656,8 @@
     to   { opacity: 1; transform: translateY(0); }
   }
   .feedback-box.visible { display: block; }
-  .feedback-box.correct-fb {
-    background: #eafaf1;
-    border: 1px solid #a9dfbf;
-  }
-  .feedback-box.wrong-fb {
-    background: #fdedec;
-    border: 1px solid #f5b7b1;
-  }
+  .feedback-box.correct-fb { background: #eafaf1; border: 1px solid #a9dfbf; }
+  .feedback-box.wrong-fb   { background: #fdedec; border: 1px solid #f5b7b1; }
   .feedback-header {
     display: flex;
     align-items: center;
@@ -622,7 +667,7 @@
     margin-bottom: .5rem;
   }
   .correct-fb .feedback-header { color: var(--green-dark); }
-  .wrong-fb .feedback-header { color: var(--red-dark); }
+  .wrong-fb   .feedback-header { color: var(--red-dark); }
   .feedback-body {
     font-size: .87rem;
     line-height: 1.65;
@@ -661,7 +706,7 @@
   .btn-next.visible { display: flex; }
   .btn-next:hover { background: var(--navy-light); transform: translateY(-1px); }
  
-  /* ── MODULE END / RESULTS ── */
+  /* ── RESULTS ── */
   #results {
     min-height: calc(100vh - 64px);
     display: none;
@@ -740,7 +785,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: .75rem;
-    max-width: 600px;
+    max-width: 700px;
     width: 100%;
     margin-bottom: 2rem;
   }
@@ -753,18 +798,10 @@
     text-align: left;
     transition: all .2s;
   }
-  .mod-nav-btn:hover {
-    border-color: var(--gold);
-    box-shadow: 0 4px 16px rgba(201,168,76,0.15);
-  }
+  .mod-nav-btn:hover { border-color: var(--gold); box-shadow: 0 4px 16px rgba(201,168,76,0.15); }
   .mod-nav-btn.completed { border-color: var(--green); }
-  .mod-nav-btn.current { border-color: var(--gold); background: var(--gold-pale); }
-  .mnb-title {
-    font-size: .82rem;
-    font-weight: 600;
-    color: var(--navy);
-    margin-bottom: .2rem;
-  }
+  .mod-nav-btn.current   { border-color: var(--gold); background: var(--gold-pale); }
+  .mnb-title  { font-size: .82rem; font-weight: 600; color: var(--navy); margin-bottom: .2rem; }
   .mnb-status { font-size: .7rem; color: var(--text-light); }
  
   /* ── GLOSSARY ── */
@@ -778,7 +815,6 @@
     width: 100%;
   }
   #glossary.active { display: flex; }
- 
   .glossary-grid {
     display: flex;
     flex-direction: column;
@@ -791,17 +827,8 @@
     padding: 1.1rem 1.5rem;
     border: 1px solid rgba(0,0,0,0.06);
   }
-  .ge-term {
-    font-weight: 700;
-    color: var(--navy);
-    font-size: .95rem;
-    margin-bottom: .35rem;
-  }
-  .ge-def {
-    font-size: .85rem;
-    color: var(--text-light);
-    line-height: 1.6;
-  }
+  .ge-term { font-weight: 700; color: var(--navy); font-size: .95rem; margin-bottom: .35rem; }
+  .ge-def  { font-size: .85rem; color: var(--text-light); line-height: 1.6; }
  
   /* ── MISC ── */
   .citation-footer {
@@ -835,53 +862,21 @@
     transition: all .18s;
     white-space: nowrap;
   }
-  .nav-tab.active {
-    background: var(--gold);
-    color: var(--navy);
-  }
+  .nav-tab.active { background: var(--gold); color: var(--navy); }
   .nav-tab:hover:not(.active) { color: var(--cream); }
  
-  /* Tooltip */
-  .tip {
-    display: inline-block;
-    background: var(--gold-pale);
-    color: #7a5a12;
-    font-size: .72rem;
-    font-weight: 500;
-    padding: .15rem .55rem;
-    border-radius: 20px;
-    margin-left: .4rem;
-    vertical-align: middle;
-    cursor: help;
-    border: 1px solid rgba(201,168,76,0.3);
-  }
- 
-  /* Responsive */
-  @media (max-width: 600px) {
-    .hero { padding: 3rem 1.25rem 2.5rem; }
-    .stats-row { gap: 1.5rem; }
-    .game-topbar { padding: .65rem 1rem; }
-    .question-card, .scenario-box { padding: 1.25rem; }
-    .result-scorecard { padding: 1.5rem; }
-    .nav-tab { padding: .35rem .6rem; font-size: .72rem; }
-  }
- 
-  /* Streak indicator */
-  .streak-bar {
-    display: flex;
-    gap: .3rem;
-    align-items: center;
-  }
+  /* Streak */
+  .streak-bar { display: flex; gap: .3rem; align-items: center; }
   .streak-dot {
     width: 8px; height: 8px;
     border-radius: 50%;
     background: rgba(0,0,0,0.1);
     transition: background .3s;
   }
-  .streak-dot.lit { background: var(--gold); }
+  .streak-dot.lit   { background: var(--gold); }
   .streak-dot.super { background: var(--green); }
  
-  /* Coin animation */
+  /* Coin pop */
   @keyframes coinPop {
     0%   { transform: scale(0) translateY(0); opacity: 1; }
     70%  { transform: scale(1.2) translateY(-30px); opacity: 1; }
@@ -893,6 +888,16 @@
     pointer-events: none;
     animation: coinPop .8s ease forwards;
     z-index: 999;
+  }
+ 
+  /* Responsive */
+  @media (max-width: 600px) {
+    .hero { padding: 3rem 1.25rem 2.5rem; }
+    .stats-row { gap: 1.5rem; }
+    .game-topbar { padding: .65rem 1rem; }
+    .question-card, .scenario-box { padding: 1.25rem; }
+    .result-scorecard { padding: 1.5rem; }
+    .nav-tab { padding: .35rem .6rem; font-size: .72rem; }
   }
 </style>
 </head>
@@ -921,13 +926,13 @@
 <div class="screen active" id="welcome">
   <div class="hero">
     <div class="hero-eyebrow">E2E Capital Management · Analyst Training Program</div>
-    <h1>Master <span>Core Accounting</span><br>Like a Wall Street Analyst</h1>
-    <p>An interactive simulation where you work your way up from Junior Analyst to Managing Director by mastering financial statements, cost behavior, break-even analysis, budgeting, and variance analysis.</p>
+    <h1>Master <span>Core Accounting</span><br>Financial & Managerial Accounting for Business Analysts</h1>
+    <p>An interactive simulation where you work your way up from Junior Analyst to Managing Director by mastering financial statements, cost behavior, break-even analysis, budgeting, variance analysis, and managerial decision making.</p>
     <button class="btn-primary" onclick="startGame()">Begin Training ↗</button>
     <div class="stats-row">
-      <div class="stat"><div class="stat-number">5</div><div class="stat-label">Modules</div></div>
-      <div class="stat"><div class="stat-number">25</div><div class="stat-label">Questions</div></div>
-      <div class="stat"><div class="stat-number">~20</div><div class="stat-label">Minutes</div></div>
+      <div class="stat"><div class="stat-number">6</div><div class="stat-label">Modules</div></div>
+      <div class="stat"><div class="stat-number">30</div><div class="stat-label">Questions</div></div>
+      <div class="stat"><div class="stat-number">~25</div><div class="stat-label">Minutes</div></div>
       <div class="stat"><div class="stat-number">∞</div><div class="stat-label">Retries</div></div>
     </div>
   </div>
@@ -971,10 +976,10 @@
         </div>
       </div>
       <div class="objective-card">
-        <div class="obj-icon">📉</div>
+        <div class="obj-icon">🏦</div>
         <div class="obj-text">
-          <h4>Interpret Variance Analysis</h4>
-          <p>Calculate and diagnose favorable and unfavorable price and efficiency variances.</p>
+          <h4>Managerial Decision Making</h4>
+          <p>Apply relevant cost analysis, operating leverage, and ROIC in investment contexts.</p>
         </div>
       </div>
     </div>
@@ -1021,10 +1026,20 @@
         </div>
         <span class="module-tag tag-bv">Budgets</span>
       </div>
+ 
+      <!-- MODULE 6 CALLOUT -->
+      <div class="module6-callout" onclick="startGame(5)" style="display:flex;align-items:center;gap:1rem;">
+        <div class="module-num" style="width:32px;height:32px;flex-shrink:0;background:var(--gold);color:var(--navy);border-radius:8px;display:grid;place-items:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:500;">06</div>
+        <div class="module-info">
+          <h4 style="color:var(--gold-light);">Managerial Decision Making</h4>
+          <p style="color:rgba(255,255,255,0.5);">Relevant costs, make vs. buy, DOL, sunk costs & ROIC — the hedge fund lens</p>
+        </div>
+        <span class="m6-badge">🏦 Advanced</span>
+      </div>
     </div>
  
     <div class="start-area">
-      <p>Complete all 5 modules to earn your <strong>E2E Managing Director certification.</strong></p>
+      <p>Complete all 6 modules to earn your <strong>E2E Managing Director certification.</strong></p>
       <div class="btn-row">
         <button class="btn-primary" onclick="startGame()">Start from Module 1 →</button>
         <button class="btn-secondary" onclick="showTab('glossary')">View Glossary</button>
@@ -1073,16 +1088,13 @@
       <div class="q-type-badge" id="qtypeBadge">Multiple Choice</div>
       <div class="question-text" id="questionText"></div>
  
-      <!-- Multiple choice -->
       <div class="options-grid" id="optionsArea"></div>
  
-      <!-- Numeric input -->
       <div class="numeric-input-wrap" id="numericArea" style="display:none">
         <input class="numeric-input" type="number" id="numericInput" placeholder="Enter your answer…">
         <button class="btn-submit" id="submitBtn" onclick="submitNumeric()">Submit</button>
       </div>
  
-      <!-- Feedback -->
       <div class="feedback-box" id="feedbackBox">
         <div class="feedback-header" id="feedbackHeader"></div>
         <div class="feedback-body" id="feedbackBody"></div>
@@ -1215,7 +1227,7 @@ const MODULES = [
     questions: [
       {
         type: "mc",
-        scenario: "E2E is evaluating Semi-Co LLC, which is a startup firm in the semiconductor space: Current Assets = $240,000 | Current Liabilities = $120,000 | Inventory = $80,000 | Cash = $60,000.",
+        scenario: "E2E is evaluating Semi-Co LLC: Current Assets = $240,000 | Current Liabilities = $120,000 | Inventory = $80,000 | Cash = $60,000.",
         question: "What is Semi-Co's Current Ratio?",
         options: ["0.5","1.33","2.0","3.0"],
         answer: 2,
@@ -1225,10 +1237,10 @@ const MODULES = [
       {
         type: "mc",
         scenario: "Semi-Co continued: Current Assets = $240,000 | Inventory = $80,000 | Current Liabilities = $120,000.",
-        question: "What is RetailCo's Quick Ratio (Acid-Test Ratio)?",
+        question: "What is Semi-Co's Quick Ratio (Acid-Test Ratio)?",
         options: ["1.33","2.0","0.67","1.0"],
         answer: 0,
-        explanation: "The <strong>Quick Ratio</strong> is a stricter liquidity measure that <em>excludes inventory</em> (less liquid).<br><br>Quick Ratio = (Current Assets − Inventory) ÷ Current Liabilities<br>= ($240,000 − $80,000) ÷ $120,000<br>= $160,000 ÷ $120,000 = <strong>1.33</strong><br><br>A quick ratio ≥ 1.0 suggests the company can meet short-term obligations without selling inventory.",
+        explanation: "The <strong>Quick Ratio</strong> is a stricter liquidity measure that <em>excludes inventory</em> (less liquid).<br><br>Quick Ratio = (Current Assets − Inventory) ÷ Current Liabilities<br>= ($240,000 − $80,000) ÷ $120,000<br>= $160,000 ÷ $120,000 = <strong>1.33</strong>",
         formula: "Quick Ratio = (Current Assets − Inventory) ÷ Current Liabilities = $160,000 ÷ $120,000 = 1.33"
       },
       {
@@ -1242,16 +1254,16 @@ const MODULES = [
           "Net Income ÷ Shareholders' Equity"
         ],
         answer: 1,
-        explanation: "<strong>Net Profit Margin</strong> = Net Income ÷ Revenue (× 100 for percentage).<br><br>It shows how many cents of profit the company keeps for every dollar of revenue. A higher margin indicates better cost control and/or pricing power.<br><br>Don't confuse it with:<br>• <em>Gross Margin</em> = Gross Profit ÷ Revenue<br>• <em>Return on Equity (ROE)</em> = Net Income ÷ Equity<br>• <em>Return on Assets (ROA)</em> = Net Income ÷ Total Assets",
+        explanation: "<strong>Net Profit Margin</strong> = Net Income ÷ Revenue (× 100 for percentage).<br><br>It shows how many cents of profit the company keeps for every dollar of revenue. A higher margin indicates better cost control and/or pricing power.",
         formula: "Net Profit Margin = Net Income ÷ Revenue × 100%"
       },
       {
         type: "numeric",
-        scenario: "Semi-Co revealed their first report: Revenue = $400,000 | Cost of Goods Sold = $210,000 | Operating Expenses = $95,000 | Interest Expense = $12,000 | Taxes = $35,000.",
-        question: "Calculate the firm's Net Profit Margin as a percentage. First determine Net Income, then divide by Revenue. Enter a whole number (e.g., 18 for 18%)."",
+        scenario: "Semi-Co: Revenue = $400,000 | COGS = $210,000 | Operating Expenses = $95,000 | Interest Expense = $12,000 | Taxes = $35,000.",
+        question: "Calculate the firm's Net Profit Margin as a percentage. Enter a whole number (e.g., 18 for 18%).",
         answer: 12,
         tolerance: 0,
-        explanation: "First calculate Net Income by subtracting all expenses from Revenue:<br><br>Net Income = $400,000 - $210,000 - $95,000 - $12,000 - $35,000 = $48,000<br><br>Now calculate Net Profit Margin:<br>Net Profit Margin = Net Income ÷ Revenue × 100%<br>= $48,000 ÷ $400,000 × 100%<br>= <strong>12%</strong><br><br>This means Semi-Co keeps $0.12 in profit for every $1 of revenue after covering all costs and expenses.",
+        explanation: "First calculate Net Income:<br>Net Income = $400,000 − $210,000 − $95,000 − $12,000 − $35,000 = <strong>$48,000</strong><br><br>Net Profit Margin = $48,000 ÷ $400,000 × 100% = <strong>12%</strong><br><br>Semi-Co keeps $0.12 in profit for every $1 of revenue after all costs.",
         formula: "Net Profit Margin = $48,000 ÷ $400,000 = 0.12 = 12%"
       },
       {
@@ -1260,7 +1272,7 @@ const MODULES = [
         question: "The Debt-to-Equity ratio primarily measures a company's:",
         options: ["Profitability","Liquidity","Financial Leverage (Solvency)","Operational Efficiency"],
         answer: 2,
-        explanation: "<strong>Debt-to-Equity (D/E)</strong> = Total Debt ÷ Shareholders' Equity.<br><br>It measures <em>financial leverage</em> — how much debt the company uses relative to equity to finance its assets. A high D/E ratio signals higher financial risk (more debt obligations) but can amplify returns when the business performs well.<br><br>Leverage ratios assess long-term solvency, not short-term liquidity.",
+        explanation: "<strong>Debt-to-Equity (D/E)</strong> = Total Debt ÷ Shareholders' Equity.<br><br>It measures <em>financial leverage</em> — how much debt the company uses relative to equity to finance its assets. A high D/E ratio signals higher financial risk but can amplify returns when the business performs well.",
         formula: "D/E Ratio = Total Liabilities ÷ Shareholders' Equity"
       }
     ]
@@ -1277,7 +1289,7 @@ const MODULES = [
         question: "E2E is advising a manufacturing client. Rent on the factory is $15,000/month regardless of production volume. This cost is best classified as:",
         options: ["Variable Cost","Fixed Cost","Mixed Cost","Step Cost"],
         answer: 1,
-        explanation: "A <strong>Fixed Cost</strong> remains constant in total regardless of the level of activity or production volume. Rent doesn't change whether you produce 0 or 10,000 units.<br><br>Note: On a <em>per-unit</em> basis, fixed costs decrease as volume increases — this is called 'spreading' or 'diluting' fixed costs.<br><br>• <em>Variable costs</em>: change in direct proportion to volume (e.g., raw materials)<br>• <em>Mixed costs</em>: have both fixed and variable components (e.g., a phone bill with base fee + per-minute charges)",
+        explanation: "A <strong>Fixed Cost</strong> remains constant in total regardless of the level of activity or production volume. Rent doesn't change whether you produce 0 or 10,000 units.<br><br>• <em>Variable costs</em>: change in direct proportion to volume<br>• <em>Mixed costs</em>: have both fixed and variable components",
         formula: null
       },
       {
@@ -1286,7 +1298,7 @@ const MODULES = [
         question: "If Apex produces 1,000 units, what are the total variable costs?",
         options: ["$5,000","$8,000","$13,000","$13 per unit"],
         answer: 2,
-        explanation: "Total Variable Cost = Variable Cost per Unit × Units Produced<br><br>Variable Cost per Unit = Direct Labor $8 + Direct Materials $5 = <strong>$13/unit</strong><br>Total Variable Cost = $13 × 1,000 = <strong>$13,000</strong><br><br>Variable costs rise proportionally with production volume. If Apex produced 2,000 units, total variable costs would double to $26,000.",
+        explanation: "Total Variable Cost = Variable Cost per Unit × Units Produced<br><br>Variable Cost per Unit = Direct Labor $8 + Direct Materials $5 = <strong>$13/unit</strong><br>Total Variable Cost = $13 × 1,000 = <strong>$13,000</strong>",
         formula: "Total Variable Cost = $13/unit × 1,000 units = $13,000"
       },
       {
@@ -1295,7 +1307,7 @@ const MODULES = [
         question: "What is Apex's Contribution Margin per unit?",
         options: ["$7","$13","$20","$28"],
         answer: 0,
-        explanation: "<strong>Contribution Margin (CM) per unit</strong> = Selling Price − Variable Cost per Unit.<br><br>CM = $20 − $13 = <strong>$7 per unit</strong><br><br>The contribution margin represents the amount each unit 'contributes' toward covering fixed costs and generating profit. Once fixed costs are fully covered, each additional unit contributes $7 directly to profit.<br><br>CM Ratio = CM/unit ÷ SP/unit = $7 ÷ $20 = 35%",
+        explanation: "<strong>Contribution Margin (CM) per unit</strong> = Selling Price − Variable Cost per Unit.<br><br>CM = $20 − $13 = <strong>$7 per unit</strong><br><br>Each unit 'contributes' $7 toward covering fixed costs and generating profit. CM Ratio = $7 ÷ $20 = 35%.",
         formula: "CM per unit = Selling Price − Variable Cost = $20 − $13 = $7"
       },
       {
@@ -1309,7 +1321,7 @@ const MODULES = [
           "The ability to generate cash from operations"
         ],
         answer: 1,
-        explanation: "<strong>Operating Leverage</strong> measures how sensitive operating income is to changes in sales. It's driven by the proportion of fixed vs. variable costs.<br><br>High operating leverage (more fixed costs) = small sales increases → large profit swings — a 'double-edged sword.'<br><br>Degree of Operating Leverage (DOL) = Contribution Margin ÷ Operating Income<br><br>A DOL of 4 means a 10% increase in sales → ~40% increase in operating income.",
+        explanation: "<strong>Operating Leverage</strong> measures how sensitive operating income is to changes in sales. It's driven by the proportion of fixed vs. variable costs.<br><br>DOL = Contribution Margin ÷ Operating Income<br><br>A DOL of 4 means a 10% increase in sales → ~40% increase in operating income.",
         formula: "DOL = Contribution Margin ÷ Operating Income"
       },
       {
@@ -1318,7 +1330,7 @@ const MODULES = [
         question: "What is Apex's Operating Income (Profit)? Enter in dollars (e.g., 12000).",
         answer: 7000,
         tolerance: 0,
-        explanation: "Using the Contribution Margin Income Statement approach:<br><br>Total CM = CM/unit × Units = $7 × 5,000 = $35,000<br>Operating Income = Total CM − Fixed Costs = $35,000 − $28,000 = <strong>$7,000</strong><br><br>This is the CVP (Cost-Volume-Profit) framework: Total Revenue − Total Variable Costs − Fixed Costs = Operating Income.",
+        explanation: "Using the Contribution Margin Income Statement approach:<br><br>Total CM = $7 × 5,000 = $35,000<br>Operating Income = $35,000 − $28,000 = <strong>$7,000</strong>",
         formula: "Operating Income = (CM/unit × Units) − Fixed Costs = ($7 × 5,000) − $28,000 = $7,000"
       }
     ]
@@ -1340,7 +1352,7 @@ const MODULES = [
           "Contribution margin equals zero"
         ],
         answer: 2,
-        explanation: "The <strong>Break-Even Point (BEP)</strong> is where Total Revenue = Total Costs, resulting in <em>zero operating income</em> — the company neither profits nor loses money.<br><br>Below BEP → operating loss<br>Above BEP → operating profit<br><br>BEP analysis helps managers understand minimum sales required to avoid losses and evaluate the risk of new ventures.",
+        explanation: "The <strong>Break-Even Point (BEP)</strong> is where Total Revenue = Total Costs, resulting in <em>zero operating income</em>.<br><br>Below BEP → operating loss<br>Above BEP → operating profit",
         formula: "At BEP: Total Revenue = Total Variable Costs + Total Fixed Costs → Operating Income = $0"
       },
       {
@@ -1349,16 +1361,16 @@ const MODULES = [
         question: "Calculate the Break-Even Point in UNITS. Enter a whole number.",
         answer: 3000,
         tolerance: 0,
-        explanation: "BEP in Units = Fixed Costs ÷ Contribution Margin per Unit<br><br>CM per Unit = $50 − $30 = <strong>$20</strong><br>BEP = $60,000 ÷ $20 = <strong>3,000 units</strong><br><br>Interpretation: StartupCo must sell exactly 3,000 units per month to cover all costs. Unit 3,001 starts generating profit.",
+        explanation: "BEP in Units = Fixed Costs ÷ CM per Unit<br><br>CM per Unit = $50 − $30 = <strong>$20</strong><br>BEP = $60,000 ÷ $20 = <strong>3,000 units</strong>",
         formula: "BEP (units) = Fixed Costs ÷ CM per unit = $60,000 ÷ $20 = 3,000 units"
       },
       {
         type: "numeric",
-        scenario: "StartupCo continued: Fixed Costs = $60,000 | CM Ratio = 40% (CM per unit $20 ÷ SP $50).",
+        scenario: "StartupCo: Fixed Costs = $60,000 | CM Ratio = 40% (CM $20 ÷ SP $50).",
         question: "Calculate the Break-Even Point in SALES DOLLARS. Enter a whole number.",
         answer: 150000,
         tolerance: 0,
-        explanation: "BEP in Sales Dollars = Fixed Costs ÷ CM Ratio<br><br>CM Ratio = CM per unit ÷ Selling Price = $20 ÷ $50 = <strong>40% = 0.40</strong><br>BEP ($) = $60,000 ÷ 0.40 = <strong>$150,000</strong><br><br>Verification: 3,000 units × $50 = $150,000 ✓<br><br>BEP in dollars is useful when a company sells multiple products at different prices.",
+        explanation: "BEP in Sales Dollars = Fixed Costs ÷ CM Ratio<br><br>CM Ratio = $20 ÷ $50 = <strong>40% = 0.40</strong><br>BEP ($) = $60,000 ÷ 0.40 = <strong>$150,000</strong>",
         formula: "BEP ($) = Fixed Costs ÷ CM Ratio = $60,000 ÷ 0.40 = $150,000"
       },
       {
@@ -1367,7 +1379,7 @@ const MODULES = [
         question: "How many units must StartupCo sell to achieve its $40,000 profit target? Enter a whole number.",
         answer: 5000,
         tolerance: 0,
-        explanation: "Target Profit Units = (Fixed Costs + Target Profit) ÷ CM per Unit<br><br>= ($60,000 + $40,000) ÷ $20<br>= $100,000 ÷ $20<br>= <strong>5,000 units</strong><br><br>Logic: The first 3,000 units cover fixed costs (break-even). The next 2,000 units × $20 CM = $40,000 profit.",
+        explanation: "Target Profit Units = (Fixed Costs + Target Profit) ÷ CM per Unit<br>= ($60,000 + $40,000) ÷ $20 = $100,000 ÷ $20 = <strong>5,000 units</strong>",
         formula: "Target Units = (Fixed Costs + Target Profit) ÷ CM/unit = $100,000 ÷ $20 = 5,000"
       },
       {
@@ -1376,7 +1388,7 @@ const MODULES = [
         question: "What is StartupCo's Margin of Safety in dollars?",
         options: ["$50,000","$150,000","$200,000","$100,000"],
         answer: 0,
-        explanation: "The <strong>Margin of Safety</strong> is the excess of actual (or budgeted) sales over break-even sales — the 'cushion' before losses occur.<br><br>Margin of Safety (units) = Actual Units − BEP Units = 4,000 − 3,000 = <strong>1,000 units</strong><br>Margin of Safety ($) = 1,000 × $50 = <strong>$50,000</strong><br><br>MoS % = MoS$ ÷ Actual Sales = $50,000 ÷ $200,000 = 25%<br>This means sales could drop 25% before StartupCo incurs a loss.",
+        explanation: "The <strong>Margin of Safety</strong> is the excess of actual sales over break-even sales.<br><br>MoS (units) = 4,000 − 3,000 = 1,000 units<br>MoS ($) = 1,000 × $50 = <strong>$50,000</strong><br><br>MoS % = $50,000 ÷ $200,000 = 25% — sales could fall 25% before a loss occurs.",
         formula: "MoS = (Actual Sales − BEP Sales) = (4,000−3,000) × $50 = $50,000"
       }
     ]
@@ -1393,8 +1405,8 @@ const MODULES = [
         question: "The master budget begins with which of the following budgets?",
         options: ["Production Budget","Cash Budget","Sales Budget","Purchases Budget"],
         answer: 2,
-        explanation: "The <strong>Sales Budget</strong> is the starting point of the master budget. All other budgets flow from the sales forecast:<br><br>Sales Budget → Production Budget → Direct Materials / Labor / Overhead Budgets → Cost of Goods Sold Budget → Budgeted Income Statement → Cash Budget → Budgeted Balance Sheet<br><br>The logic: you must first estimate <em>what you expect to sell</em> before planning production, purchasing, staffing, and cash needs.",
-        formula: "Master Budget Flow: Sales → Production → Direct Materials/Direct Labor/Overhead → COGS → Income Statement → Cash → Balance Sheet"
+        explanation: "The <strong>Sales Budget</strong> is the starting point of the master budget. All other budgets flow from the sales forecast:<br><br>Sales → Production → Direct Materials/Labor/Overhead → COGS → Income Statement → Cash → Balance Sheet",
+        formula: "Master Budget Flow: Sales → Production → DM/DL/Overhead → COGS → Income Statement → Cash → Balance Sheet"
       },
       {
         type: "mc",
@@ -1407,30 +1419,25 @@ const MODULES = [
           "Is approved by senior management each quarter"
         ],
         answer: 1,
-        explanation: "A <strong>Flexible Budget</strong> adjusts (flexes) budgeted revenues and variable costs to match the <em>actual</em> level of activity, making performance comparisons more meaningful.<br><br>Example: If you budgeted for 1,000 units but sold 1,200, a flexible budget recalculates expected costs at 1,200 units — so variances reflect <em>efficiency</em>, not just volume differences.<br><br>A <em>static budget</em> stays fixed at the original planned activity level regardless of actual results.",
+        explanation: "A <strong>Flexible Budget</strong> adjusts budgeted revenues and variable costs to match the <em>actual</em> level of activity, making performance comparisons more meaningful.<br><br>A <em>static budget</em> stays fixed at the original planned level regardless of actual results.",
         formula: null
       },
       {
         type: "numeric",
         scenario: "E2E's portfolio company purchased 5,000 kg of material. Standard price = $4.00/kg. Actual price paid = $4.50/kg.",
-        question: "Calculate the Direct Materials PRICE Variance. Enter the dollar amount as a positive number (e.g., 3100). Note: this will be an Unfavorable variance.",
+        question: "Calculate the Direct Materials PRICE Variance. Enter the dollar amount as a positive number. This is an Unfavorable variance.",
         answer: 2500,
         tolerance: 0,
-        explanation: "Materials Price Variance (MPV) = (Actual Price − Standard Price) × Actual Quantity Purchased<br><br>= ($4.50 − $4.00) × 5,000 kg<br>= $0.50 × 5,000<br>= <strong>$2,500 Unfavorable</strong><br><br>Unfavorable because the company paid MORE than the standard price. The purchasing department would investigate — possible causes: supplier price increase, rush order, quality upgrade.",
+        explanation: "Materials Price Variance = (Actual Price − Standard Price) × Actual Quantity<br>= ($4.50 − $4.00) × 5,000 = $0.50 × 5,000 = <strong>$2,500 Unfavorable</strong><br><br>Unfavorable — the company paid more than standard.",
         formula: "MPV = (AP − SP) × AQ = ($4.50−$4.00) × 5,000 = $2,500 U"
       },
       {
         type: "mc",
-        scenario: "Actual hours worked = 2,200 hours. Standard hours allowed for actual output = 2,000 hours. Standard labor rate = $15/hour.",
+        scenario: "Actual hours worked = 2,200. Standard hours for actual output = 2,000. Standard rate = $15/hour.",
         question: "What is the Direct Labor Efficiency Variance and its nature?",
-        options: [
-          "$3,000 Unfavorable",
-          "$3,000 Favorable",
-          "$33,000 Unfavorable",
-          "$30,000 Favorable"
-        ],
+        options: ["$3,000 Unfavorable","$3,000 Favorable","$33,000 Unfavorable","$30,000 Favorable"],
         answer: 0,
-        explanation: "Labor Efficiency Variance = (Actual Hours − Standard Hours) × Standard Rate<br><br>= (2,200 − 2,000) × $15<br>= 200 extra hours × $15<br>= <strong>$3,000 Unfavorable</strong><br><br>Unfavorable because workers took <em>more</em> time than the standard. Possible causes: untrained workers, machine breakdowns, poor scheduling. The production manager would typically be responsible.",
+        explanation: "Labor Efficiency Variance = (Actual Hours − Standard Hours) × Standard Rate<br>= (2,200 − 2,000) × $15 = 200 × $15 = <strong>$3,000 Unfavorable</strong><br><br>Unfavorable — workers took more time than standard.",
         formula: "LEV = (AH − SH) × SR = (2,200 − 2,000) × $15 = $3,000 U"
       },
       {
@@ -1444,8 +1451,76 @@ const MODULES = [
           "Fixed costs are under budget"
         ],
         answer: 1,
-        explanation: "The <strong>Sales Volume Variance</strong> measures the impact of selling more (or fewer) units than planned.<br><br>Favorable (F) = Actual Units Sold > Budgeted Units → more contribution margin than expected<br>Unfavorable (U) = Actual Units Sold < Budgeted Units → less CM<br><br>Sales Volume Variance = (Actual Units − Budgeted Units) × Budgeted CM per unit<br><br>Note: Actual price vs. budgeted price is captured by the <em>Sales Price Variance</em>, not volume variance.",
+        explanation: "Favorable Sales Volume Variance = Actual Units Sold > Budgeted Units → more contribution margin than expected.<br><br>Sales Volume Variance = (Actual Units − Budgeted Units) × Budgeted CM per unit",
         formula: "Sales Volume Variance = (Actual Units − Budget Units) × Budgeted CM per unit"
+      }
+    ]
+  },
+ 
+  /* ── MODULE 6: Managerial Decision Making ── */
+  {
+    title: "Managerial Decision Making",
+    tag: "Decisions",
+    questions: [
+      {
+        type: "mc",
+        scenario: "E2E Capital is conducting due diligence on PrecisionTech, a portfolio company operating at 80% capacity (8,000 of 10,000 units/month). A sovereign wealth fund client offers to purchase 1,500 units at $35/unit. Normal selling price = $50/unit | Variable cost = $28/unit | Fixed Costs = $80,000/month (these are unavoidable regardless of the order).",
+        question: "Should E2E recommend that PrecisionTech accept the special order? What is the incremental financial impact?",
+        options: [
+          "Reject — the $35 price is below the $50 normal price and will dilute overall margins",
+          "Accept — the incremental contribution to profit is +$10,500",
+          "Reject — the fully-allocated unit cost ($38) exceeds the offer price of $35",
+          "Accept — but only if fixed costs can be reduced proportionally first"
+        ],
+        answer: 1,
+        explanation: "In managerial decisions, only <strong>relevant (incremental) costs</strong> matter. Fixed costs that won't change are <em>irrelevant</em> to the decision.<br><br>PrecisionTech has 2,000 units of idle capacity, so taking on 1,500 units requires <em>zero additional fixed costs</em>.<br><br>Incremental Revenue = 1,500 × $35 = $52,500<br>Incremental Variable Cost = 1,500 × $28 = $42,000<br><strong>Net Incremental Profit = +$10,500 → Accept ✓</strong><br><br>Option C is the classic trap: the fully-absorbed cost of $38/unit ($28 variable + $10 fixed allocation) <em>looks</em> like a loss — but fixed costs don't increase with this order. Spreading fixed costs over existing units is an accounting convention, not incremental economics. This is precisely how hedge fund analysts evaluate pricing decisions at portfolio companies.",
+        formula: "Incremental Profit = (Special Price − Variable Cost) × Units = ($35 − $28) × 1,500 = $10,500"
+      },
+      {
+        type: "mc",
+        scenario: "E2E's investment committee is reviewing Alpine Components (4,000 units/year). Alpine currently makes an internal component at: Direct Materials $6/unit, Direct Labor $4/unit, Variable Overhead $3/unit, Fixed Overhead $5/unit ($20,000 total — of which $12,000 is avoidable if production stops; the remaining $8,000 continues regardless). An outside supplier quotes $17/unit.",
+        question: "Using relevant cost analysis, what is E2E's recommendation and the net annual impact?",
+        options: [
+          "Outsource — supplier's $17 is below Alpine's fully-absorbed cost of $18/unit",
+          "Make in-house — relevant cost to make ($16/unit) beats the buy price ($17/unit), saving $4,000/year",
+          "Outsource — variable cost savings justify the switch regardless of fixed costs",
+          "Make in-house — all $20,000 in fixed costs must be included, making the total make cost $72,000 vs $68,000 to buy"
+        ],
+        answer: 1,
+        explanation: "Make-vs-Buy uses only <strong>avoidable costs</strong> — costs that actually disappear if the company stops making the part.<br><br><strong>Relevant cost to MAKE (avoidable only):</strong><br>• Variable: ($6 + $4 + $3) × 4,000 = $52,000<br>• Avoidable fixed overhead: $12,000<br>• <strong>Total relevant make cost = $64,000 → $16.00/unit</strong><br><br><strong>Cost to BUY:</strong><br>• $17 × 4,000 = <strong>$68,000</strong><br><br>Making in-house saves $68,000 − $64,000 = <strong>$4,000/year → Keep making ✓</strong><br><br>Option A is the classic trap: the $18 fully-absorbed cost includes $8,000 of <em>unavoidable</em> fixed overhead. That $8K is spent whether Alpine makes or buys — it never enters the comparison. E2E analysts must strip out unavoidable costs to reveal the true economic trade-off.",
+        formula: "Relevant make cost = $52,000 variable + $12,000 avoidable fixed = $64,000 vs Buy $68,000 → Save $4,000"
+      },
+      {
+        type: "numeric",
+        scenario: "E2E is stress-testing RidgeLine Industrial for a potential acquisition. RidgeLine's Contribution Margin = $180,000 and Fixed Costs = $120,000, yielding Operating Income of $60,000. E2E's risk team wants to quantify how sensitive operating income is to a revenue decline — a standard metric in hedge fund downside scenario modeling.",
+        question: "Calculate RidgeLine's Degree of Operating Leverage (DOL). Enter a whole number.",
+        answer: 3,
+        tolerance: 0,
+        explanation: "<strong>Degree of Operating Leverage (DOL)</strong> = Contribution Margin ÷ Operating Income<br><br>DOL = $180,000 ÷ $60,000 = <strong>3</strong><br><br>What this tells E2E's risk desk:<br>• A <strong>1% change in revenue → 3% change in operating income</strong><br>• A 20% revenue decline → ~60% drop in operating income — critical for downside scenarios<br>• High-DOL companies (heavy fixed cost base) amplify both gains and losses<br>• Quant funds like Renaissance Technologies embed operating leverage directly into factor-based volatility models, because DOL predicts earnings sensitivity to macro shocks (interest rates, demand cycles) better than headline margin alone",
+        formula: "DOL = Contribution Margin ÷ Operating Income = $180,000 ÷ $60,000 = 3"
+      },
+      {
+        type: "mc",
+        scenario: "E2E acquired a stake in a software firm for $2,000,000. The firm has already spent $500,000 on a product development project that is 60% complete. A revised engineering estimate shows completing the project requires an additional $600,000. If completed, the product is expected to generate $900,000 in revenue. The $500,000 already spent cannot be recovered under any scenario.",
+        question: "Applying relevant cost principles, what should E2E's investment committee recommend?",
+        options: [
+          "Abandon — total project costs ($1.1M) exceed projected revenue ($900K), destroying value",
+          "Complete the project — the relevant future cash flow is net positive (+$300,000)",
+          "Abandon — the project has exceeded its original budget and requires board re-approval",
+          "Complete — the $500,000 sunk investment must be recovered to justify the acquisition price"
+        ],
+        answer: 1,
+        explanation: "<strong>Sunk costs are irrelevant to forward-looking decisions.</strong> The $500,000 already spent is gone regardless of what happens next — it must not be allowed to influence the decision.<br><br>The only relevant question: <em>What is the incremental outcome from here?</em><br><br>• Future cost to complete: <strong>$600,000</strong><br>• Future revenue upon completion: <strong>$900,000</strong><br>• Net future benefit: <strong>+$300,000 → Complete the project ✓</strong><br><br>Option A is the textbook sunk cost fallacy — adding the already-spent $500K to the analysis. Options C and D are also anchored to sunk reasoning.<br><br>This is one of the most important — and most commonly violated — principles in capital allocation. PE and hedge fund managers who correctly ignore sunk costs make significantly better portfolio continuation and exit decisions.",
+        formula: "Decision = Future Revenue ($900K) − Future Cost ($600K) = +$300K → Complete"
+      },
+      {
+        type: "numeric",
+        scenario: "E2E Capital is evaluating a potential leveraged buyout of ManufactureCo. The investment committee applies a minimum <strong>hurdle rate of 25% Return on Invested Capital (ROIC)</strong>. ManufactureCo has $400,000 of invested capital actively deployed in operations. Before proceeding, E2E must confirm whether the company's earnings clear the threshold.",
+        question: "What minimum operating income must ManufactureCo generate to satisfy E2E's 25% ROIC hurdle rate? Enter in dollars (e.g., 75000).",
+        answer: 100000,
+        tolerance: 0,
+        explanation: "<strong>Return on Invested Capital (ROIC)</strong> = Operating Income ÷ Invested Capital<br><br>Rearranged for minimum operating income:<br>Required Operating Income = ROIC Target × Invested Capital<br>= 25% × $400,000 = <strong>$100,000</strong><br><br>If ManufactureCo generates less than $100,000, it fails E2E's hurdle rate — meaning the investment does not create sufficient value relative to alternatives or the cost of capital.<br><br>In practice, hedge funds and PE firms set ROIC hurdles based on their weighted average cost of capital (WACC) plus a risk premium. Firms like Renaissance Technologies extend this into alpha generation: every capital deployment must exceed its opportunity cost on a risk-adjusted basis, or the capital is better redeployed elsewhere.",
+        formula: "Required Operating Income = ROIC Target × Invested Capital = 25% × $400,000 = $100,000"
       }
     ]
   }
@@ -1458,7 +1533,7 @@ const GLOSSARY = [
   { term: "Income Statement", def: "A financial statement showing revenues, expenses, and net income over a period. Also called the Profit & Loss (P&L) statement." },
   { term: "Balance Sheet", def: "A snapshot of a company's assets, liabilities, and shareholders' equity at a specific point in time. Must satisfy: Assets = Liabilities + Equity." },
   { term: "Cash Flow Statement", def: "Reports cash inflows and outflows across three activities: Operating, Investing, and Financing. Reconciles net income to actual cash position." },
-  { term: "Gross Profit", def: "Revenue minus Cost of Goods Sold (COGS). It represents profit before operating expenses are deducted." },
+  { term: "Gross Profit", def: "Revenue minus Cost of Goods Sold (COGS). Profit before operating expenses are deducted." },
   { term: "Net Income", def: "The 'bottom line' — profit remaining after all expenses, interest, and taxes are deducted from revenue." },
   { term: "Current Ratio", def: "Current Assets ÷ Current Liabilities. Measures a firm's ability to cover short-term obligations. A ratio > 1 is generally desirable." },
   { term: "Quick Ratio", def: "(Current Assets − Inventory) ÷ Current Liabilities. A stricter liquidity measure that excludes less-liquid inventory." },
@@ -1476,7 +1551,15 @@ const GLOSSARY = [
   { term: "Materials Price Variance", def: "(Actual Price − Standard Price) × Actual Quantity. Measures the cost impact of paying a different price than planned for materials." },
   { term: "Labor Efficiency Variance", def: "(Actual Hours − Standard Hours) × Standard Rate. Measures the cost impact of using more or fewer labor hours than planned." },
   { term: "Favorable Variance", def: "A variance where actual results are better than standard/budget — either lower costs or higher revenue than planned." },
-  { term: "Unfavorable Variance", def: "A variance where actual results are worse than standard/budget — either higher costs or lower revenue than planned." }
+  { term: "Unfavorable Variance", def: "A variance where actual results are worse than standard/budget — either higher costs or lower revenue than planned." },
+  { term: "Relevant Costs", def: "Future costs that differ between decision alternatives. Only relevant costs (incremental, avoidable) should drive managerial decisions; sunk and unavoidable costs are excluded." },
+  { term: "Sunk Cost", def: "A cost already incurred and unrecoverable regardless of any future decision. Sunk costs must be ignored in forward-looking analysis — including in M&A and portfolio management." },
+  { term: "Special Order Decision", def: "A one-time pricing decision evaluated using incremental analysis. If spare capacity exists, the order is profitable as long as price exceeds variable cost — fixed cost allocation is irrelevant." },
+  { term: "Make vs. Buy Analysis", def: "A decision framework comparing the relevant (avoidable) cost to manufacture a component internally against the cost to outsource it. Unavoidable fixed costs are excluded from both sides." },
+  { term: "Degree of Operating Leverage (DOL)", def: "Contribution Margin ÷ Operating Income. Quantifies how sensitively operating income responds to revenue changes. A DOL of 3 means a 1% revenue change produces a 3% change in operating income." },
+  { term: "Return on Invested Capital (ROIC)", def: "Operating Income ÷ Invested Capital. A core investment banking and private equity metric that measures how efficiently a company generates returns on the capital deployed in its operations." },
+  { term: "Hurdle Rate", def: "The minimum acceptable rate of return on an investment, typically set equal to the company's cost of capital plus a risk premium. Capital allocations that fail to meet the hurdle rate are rejected." },
+  { term: "Avoidable Costs", def: "Costs that will be eliminated if a particular course of action is chosen (e.g., stopping production of a component). Contrasted with unavoidable costs, which continue regardless of the decision." }
 ];
  
 /* ══════════════════════════════════════════════
@@ -1490,8 +1573,8 @@ let state = {
   lives: 3,
   streak: 0,
   answered: false,
-  moduleResults: [null, null, null, null, null],
-  moduleCorrect: [0, 0, 0, 0, 0]
+  moduleResults: [null, null, null, null, null, null],
+  moduleCorrect: [0, 0, 0, 0, 0, 0]
 };
  
 /* ══════════════════════════════════════════════
@@ -1524,33 +1607,32 @@ function loadQuestion() {
   const mod = MODULES[state.moduleIndex];
   const q   = mod.questions[state.questionIndex];
   const total = mod.questions.length;
+  const isM6 = state.moduleIndex === 5;
  
-  // Top bar
   document.getElementById('moduleLabel').textContent = `Module ${state.moduleIndex+1}: ${mod.title}`;
   document.getElementById('progressBar').style.width = `${(state.questionIndex/total)*100}%`;
   document.getElementById('qCounter').textContent = `Q ${state.questionIndex+1} / ${total}`;
   updateStreak();
  
-  // Scenario
+  // Scenario box
   const scBox = document.getElementById('scenarioBox');
   if (q.scenario) {
     scBox.classList.add('visible');
+    scBox.classList.toggle('m6-scenario', isM6);
     document.getElementById('scenarioText').innerHTML = q.scenario;
   } else {
     scBox.classList.remove('visible');
+    scBox.classList.remove('m6-scenario');
   }
  
-  // Question
   document.getElementById('qtypeBadge').textContent = q.type === 'mc' ? 'Multiple Choice' : 'Calculation';
   document.getElementById('questionText').textContent = q.question;
  
-  // Reset feedback & next btn
   const fb = document.getElementById('feedbackBox');
   fb.classList.remove('visible','correct-fb','wrong-fb');
   const nb = document.getElementById('nextBtn');
   nb.classList.remove('visible');
  
-  // Render inputs
   if (q.type === 'mc') {
     renderMC(q);
   } else {
@@ -1625,9 +1707,9 @@ function submitNumeric() {
 }
  
 function showFeedback(correct, q) {
-  const fb = document.getElementById('feedbackBox');
-  const header = document.getElementById('feedbackHeader');
-  const body   = document.getElementById('feedbackBody');
+  const fb      = document.getElementById('feedbackBox');
+  const header  = document.getElementById('feedbackHeader');
+  const body    = document.getElementById('feedbackBody');
   const formula = document.getElementById('feedbackFormula');
  
   fb.classList.remove('correct-fb','wrong-fb');
@@ -1675,31 +1757,28 @@ function nextQuestion() {
    RESULTS
 ══════════════════════════════════════════════ */
 function showResults() {
-  const modQ   = MODULES[state.moduleIndex].questions.length;
+  const modQ    = MODULES[state.moduleIndex].questions.length;
   const correct = state.moduleCorrect[state.moduleIndex] || 0;
-  const pct = Math.round((correct / modQ) * 100);
-  const earned = correct * 100;
-  state.score += earned;
+  const pct     = Math.round((correct / modQ) * 100);
+  const earned  = correct * 100;
+  state.score  += earned;
   state.moduleResults[state.moduleIndex] = pct;
  
-  // Grade
-  let grade = pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 70 ? 'C' : pct >= 60 ? 'D' : 'F';
+  let grade  = pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 70 ? 'C' : pct >= 60 ? 'D' : 'F';
   let trophy = pct === 100 ? '🏆' : pct >= 80 ? '🥈' : pct >= 60 ? '🥉' : '📚';
-  let title = pct >= 90 ? 'Outstanding Performance!' : pct >= 70 ? 'Module Complete!' : 'Keep Studying!';
-  let rank = getRank();
+  let title  = pct >= 90 ? 'Outstanding Performance!' : pct >= 70 ? 'Module Complete!' : 'Keep Studying!';
  
   document.getElementById('resultTrophy').textContent = trophy;
-  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultTitle').textContent  = title;
   document.getElementById('resultSubtitle').textContent = `Module ${state.moduleIndex+1}: ${MODULES[state.moduleIndex].title}`;
-  document.getElementById('gradeBadge').textContent = grade;
-  document.getElementById('scCorrect').textContent = `${correct} / ${modQ}`;
-  document.getElementById('scAccuracy').textContent = `${pct}%`;
-  document.getElementById('scPoints').textContent = `+${earned} pts`;
-  document.getElementById('scTotal').textContent = `${state.score} pts`;
-  document.getElementById('scRank').textContent = rank;
-  document.getElementById('headerScore').textContent = `⭐ ${state.score} pts`;
+  document.getElementById('gradeBadge').textContent   = grade;
+  document.getElementById('scCorrect').textContent    = `${correct} / ${modQ}`;
+  document.getElementById('scAccuracy').textContent   = `${pct}%`;
+  document.getElementById('scPoints').textContent     = `+${earned} pts`;
+  document.getElementById('scTotal').textContent      = `${state.score} pts`;
+  document.getElementById('scRank').textContent       = getRank();
+  document.getElementById('headerScore').textContent  = `⭐ ${state.score} pts`;
  
-  // Module nav
   const grid = document.getElementById('moduleNavGrid');
   grid.innerHTML = '';
   MODULES.forEach((m, i) => {
@@ -1707,17 +1786,17 @@ function showResults() {
     btn.className = 'mod-nav-btn' +
       (state.moduleResults[i] !== null ? ' completed' : '') +
       (i === state.moduleIndex ? ' current' : '');
-    btn.innerHTML = `<div class="mnb-title">${i+1}. ${m.title.split(' ').slice(0,3).join(' ')}...</div>
+    btn.innerHTML = `<div class="mnb-title">${i+1}. ${m.title.split(' ').slice(0,3).join(' ')}…</div>
       <div class="mnb-status">${state.moduleResults[i] !== null ? `✓ ${state.moduleResults[i]}%` : 'Not started'}</div>`;
     btn.onclick = () => startGame(i);
     grid.appendChild(btn);
   });
  
-  // Next module button
   const nb = document.getElementById('nextModuleBtn');
   if (state.moduleIndex < MODULES.length - 1) {
     nb.style.display = '';
     nb.textContent = `Next: Module ${state.moduleIndex+2} →`;
+    nb.onclick = advanceModule;
   } else {
     nb.textContent = '🎓 View Final Score';
     nb.onclick = showFinalScore;
@@ -1740,7 +1819,7 @@ function retryModule() {
  
 function showFinalScore() {
   const allDone = state.moduleResults.every(r => r !== null);
-  const avg = allDone ? Math.round(state.moduleResults.reduce((a,b)=>a+b,0)/5) : 0;
+  const avg = allDone ? Math.round(state.moduleResults.reduce((a,b)=>a+b,0)/6) : 0;
   alert(`🎓 E2E Capital Management — Final Certificate\n\nTotal Score: ${state.score} pts\nOverall Average: ${avg}%\nRank: ${getRank()}\n\nCongratulations on completing the Analyst Training Program!`);
 }
  
@@ -1775,9 +1854,9 @@ function updateStreak() {
  
 function getRank() {
   const s = state.score;
-  if (s >= 1200) return '👑 Managing Director';
-  if (s >= 900)  return '📊 VP of Finance';
-  if (s >= 600)  return '💼 Senior Analyst';
+  if (s >= 1500) return '👑 Managing Director';
+  if (s >= 1100) return '📊 VP of Finance';
+  if (s >= 700)  return '💼 Senior Analyst';
   if (s >= 300)  return '📈 Analyst';
   return '🎓 Junior Analyst';
 }
